@@ -1,0 +1,13 @@
+Rails.application.routes.draw do
+     root "dashboard#index"
+
+     get "login", to: "sessions#new"
+     post "login", to: "sessions#create"
+     delete "logout", to: "sessions#destroy"
+
+     resources :tasks do
+          resources :time_entries, only: :create
+     end
+
+     get "up" => "rails/health#show", as: :rails_health_check
+end

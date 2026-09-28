@@ -1,0 +1,79 @@
+<%= form_with model: task, class: "panel task-form" do |form| %>
+  <% if task.errors.any? %>
+    <div class="error-summary" role="alert" aria-labelledby="error-heading">
+      <h2 id="error-heading"><%= pluralize(task.errors.count, "error") %> prevented this task from being saved</h2>
+      <ul>
+        <% task.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :title %>
+    <%= form.text_field :title, required: true %>
+  </div>
+
+  <div class="form-grid">
+    <div class="field">
+      <%= form.label :project_id, "Project" %>
+      <%= form.collection_select :project_id, @projects, :id, :name, { prompt: "Select a project" }, required: true %>
+    </div>
+    <div class="field">
+      <%= form.label :team_id, "Team" %>
+      <%= form.collection_select :team_id, @teams, :id, :name, { prompt: "Select a team" }, required: true %>
+    </div>
+    <div class="field">
+      <%= form.label :subteam_id, "Subteam (optional)" %>
+      <%= form.collection_select :subteam_id, @subteams, :id, :name, { include_blank: "No subteam" } %>
+    </div>
+    <div class="field">
+      <%= form.label :status %>
+      <%= form.select :status, Task.statuses.keys.map { |status| [status.humanize, status] } %>
+    </div>
+  </div>
+
+  <div class="field">
+    <%= form.label :description, "Expected deliverables" %>
+    <%= form.text_area :description, rows: 4, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :instructions, "Work instructions" %>
+    <%= form.text_area :instructions, rows: 5 %>
+  </div>
+
+  <div class="form-grid">
+    <div class="field">
+      <%= form.label :link_url, "Supporting link" %>
+      <%= form.url_field :link_url, placeholder: "https://…" %>
+    </div>
+    <div class="field">
+      <%= form.label :due_date %>
+      <%= form.date_field :due_date %>
+    </div>
+    <div class="field">
+      <%= form.label :estimated_hours %>
+      <%= form.number_field :estimated_hours, min: 0, step: 0.25, required: true %>
+    </div>
+  </div>
+
+  <fieldset class="field">
+    <legend>Assigned members</legend>
+    <p class="hint">Choose one or more members from the selected team.</p>
+    <div class="check-grid">
+      <%= form.collection_check_boxes :assignee_ids, @assignees, :id, :name do |box| %>
+        <%= box.label class: "check-option" do %>
+          <%= box.check_box %>
+          <span><%= box.text %></span>
+        <% end %>
+      <% end %>
+    </div>
+  </fieldset>
+
+  <div class="form-actions">
+    <%= form.submit class: "button" %>
+    <%= link_to "Cancel", task.persisted? ? task_path(task) : tasks_path, class: "button button-secondary" %>
+  </div>
+<% end %>

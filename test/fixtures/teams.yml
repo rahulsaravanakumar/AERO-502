@@ -1,0 +1,7 @@
+aerodynamics:
+  name: Aerodynamics
+  project: aero
+
+structures:
+  name: Structures
+  project: aero

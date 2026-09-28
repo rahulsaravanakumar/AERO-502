@@ -1,0 +1,76 @@
+<% content_for :title, "#{@task.title} · AERO Task Hub" %>
+
+<div class="page-heading">
+  <div>
+    <p class="eyebrow"><%= @task.project.name %> · <%= @task.team.name %></p>
+    <h1><%= @task.title %></h1>
+    <span class="badge status-<%= @task.status %>"><%= @task.status.humanize %></span>
+  </div>
+  <% if current_user.can_manage?(@task) %>
+    <%= link_to "Edit task", edit_task_path(@task), class: "button" %>
+  <% end %>
+</div>
+
+<div class="detail-grid">
+  <section class="panel">
+    <h2>Task details</h2>
+    <dl class="detail-list">
+      <div><dt>Expected deliverables</dt><dd><%= simple_format(@task.description) %></dd></div>
+      <div><dt>Work instructions</dt><dd><%= simple_format(@task.instructions.presence || "No additional instructions.") %></dd></div>
+      <div><dt>Assigned members</dt><dd><%= @task.assignees.map(&:name).to_sentence.presence || "Unassigned" %></dd></div>
+      <div><dt>Due date</dt><dd><%= @task.due_date&.to_fs(:long) || "No date" %></dd></div>
+      <div><dt>Supporting link</dt><dd><%= @task.link_url.present? ? link_to("Open resource", ERB::Util.html_escape(@task.link_url), target: "_blank", rel: "noopener") : "None" %></dd></div>
+    </dl>
+  </section>
+
+  <aside>
+    <section class="panel effort-panel">
+      <h2>Planned vs. actual</h2>
+      <div class="effort-numbers">
+        <div><strong><%= number_with_precision(@task.estimated_hours, precision: 2, strip_insignificant_zeros: true) %>h</strong><span>Estimated</span></div>
+        <div><strong><%= number_with_precision(@task.total_actual_hours, precision: 2, strip_insignificant_zeros: true) %>h</strong><span>Actual</span></div>
+        <div><strong><%= number_with_precision(@task.variance_hours, precision: 2, strip_insignificant_zeros: true) %>h</strong><span>Variance</span></div>
+      </div>
+    </section>
+
+    <% if current_user.can_work_on?(@task) %>
+      <section class="panel">
+        <h2>Update status</h2>
+        <%= form_with model: @task, class: "inline-form" do |form| %>
+          <%= form.label :status, "Task status" %>
+          <%= form.select :status, Task.statuses.keys.map { |status| [status.humanize, status] } %>
+          <%= form.submit "Save status", class: "button" %>
+        <% end %>
+      </section>
+
+      <section class="panel">
+        <h2>Record actual hours</h2>
+        <%= form_with model: [@task, @time_entry], class: "inline-form" do |form| %>
+          <%= form.label :hours %>
+          <%= form.number_field :hours, min: 0.01, step: 0.25, required: true %>
+          <%= form.label :worked_on, "Date worked" %>
+          <%= form.date_field :worked_on, required: true %>
+          <%= form.label :note, "Note (optional)" %>
+          <%= form.text_field :note %>
+          <%= form.submit "Add hours", class: "button" %>
+        <% end %>
+      </section>
+    <% end %>
+  </aside>
+</div>
+
+<section class="panel">
+  <h2>Hours by member</h2>
+  <% if @task.time_entries.any? %>
+    <div class="member-grid">
+      <% @task.assignees.each do |member| %>
+        <article>
+          <span><%= member.name %></span>
+          <strong><%= number_with_precision(@task.actual_hours_for(member), precision: 2, strip_insignificant_zeros: true) %> hours</strong>
+        </article>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="muted">No actual hours have been recorded.</p>
+  <% end %>
+</section>

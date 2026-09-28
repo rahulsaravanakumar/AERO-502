@@ -1,0 +1,20 @@
+# Omakase Ruby styling for Rails
+inherit_gem: { rubocop-rails-omakase: rubocop.yml }
+
+# Overwrite or add rules to create your own house style
+
+# AERO-502 team standard: five spaces for each indentation level.
+Layout/IndentationWidth:
+  Width: 5
+
+Layout/FirstArrayElementIndentation:
+  IndentationWidth: 5
+
+Layout/FirstHashElementIndentation:
+  IndentationWidth: 5
+
+Layout/FirstArgumentIndentation:
+  IndentationWidth: 5
+
+Layout/MultilineOperationIndentation:
+  IndentationWidth: 5

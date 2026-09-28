@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title><%= content_for(:title) || "AERO Task Hub" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="#5b1831">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <header class="site-header">
+      <%= link_to root_path, class: "brand", aria: { label: "AERO Task Hub home" } do %>
+        <span class="brand-mark" aria-hidden="true">A</span>
+        <span>AERO Task Hub</span>
+      <% end %>
+
+      <% if signed_in? %>
+        <nav aria-label="Primary navigation">
+          <%= link_to "Dashboard", root_path %>
+          <%= link_to "Tasks", tasks_path %>
+          <%= link_to "My Tasks", tasks_path(view: "mine") %>
+          <% if current_user.leader? %>
+            <%= link_to "New Task", new_task_path, class: "button button-small" %>
+          <% end %>
+        </nav>
+        <div class="account">
+          <span><%= current_user.name %> · <%= current_user.role.humanize %></span>
+          <%= button_to "Sign out", logout_path, method: :delete, class: "link-button" %>
+        </div>
+      <% end %>
+    </header>
+
+    <main id="main-content" class="page-shell">
+      <% flash.each do |type, message| %>
+        <div class="flash flash-<%= type %>" role="<%= type == "alert" ? "alert" : "status" %>">
+          <%= message %>
+        </div>
+      <% end %>
+      <%= yield %>
+    </main>
+  </body>
+</html>

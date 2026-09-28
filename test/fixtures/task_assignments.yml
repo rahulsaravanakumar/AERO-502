@@ -1,0 +1,7 @@
+wing_member:
+  task: wing_test
+  user: member
+
+spar_member:
+  task: spar_check
+  user: other_member

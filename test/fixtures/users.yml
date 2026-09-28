@@ -1,0 +1,33 @@
+chief:
+  name: Casey Chief
+  email: chief@example.test
+  password_digest: <%= BCrypt::Password.create("password") %>
+  role: 2
+
+officer:
+  name: Olivia Officer
+  email: officer@example.test
+  password_digest: <%= BCrypt::Password.create("password") %>
+  role: 1
+  team: aerodynamics
+
+other_officer:
+  name: Owen Officer
+  email: other.officer@example.test
+  password_digest: <%= BCrypt::Password.create("password") %>
+  role: 1
+  team: structures
+
+member:
+  name: Morgan Member
+  email: member@example.test
+  password_digest: <%= BCrypt::Password.create("password") %>
+  role: 0
+  team: aerodynamics
+
+other_member:
+  name: Bailey Member
+  email: other.member@example.test
+  password_digest: <%= BCrypt::Password.create("password") %>
+  role: 0
+  team: structures

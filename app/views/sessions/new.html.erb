@@ -1,0 +1,26 @@
+<% content_for :title, "Sign in · AERO Task Hub" %>
+
+<section class="auth-card" aria-labelledby="sign-in-heading">
+  <div>
+    <p class="eyebrow">SAE AERO DESIGN</p>
+    <h1 id="sign-in-heading">Plan the work.<br>Track the hours.</h1>
+    <p class="lede">A role-aware workspace for task assignments, status updates, and planned-versus-actual effort.</p>
+  </div>
+
+  <%= form_with url: login_path, class: "panel login-form" do |form| %>
+    <h2>Sign in</h2>
+    <p class="muted">Use the practice account supplied by your team lead.</p>
+
+    <div class="field">
+      <%= form.label :email, "Email address" %>
+      <%= form.email_field :email, required: true, autofocus: true, autocomplete: "email" %>
+    </div>
+
+    <div class="field">
+      <%= form.label :password %>
+      <%= form.password_field :password, required: true, autocomplete: "current-password" %>
+    </div>
+
+    <%= form.submit "Sign in", class: "button button-wide" %>
+  <% end %>
+</section>

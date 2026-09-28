@@ -1,0 +1,23 @@
+{
+  "name": "AERO Task Hub",
+  "description": "Role-aware task and effort tracking for the SAE AERO Design team.",
+  "repository": "https://github.com/rahulsaravanakumar/AERO-502",
+  "keywords": [
+    "ruby",
+    "rails",
+    "postgresql"
+  ],
+  "env": {
+    "RAILS_MASTER_KEY": {
+      "description": "Rails production credentials key. Configure this securely; never commit it.",
+      "required": true
+    },
+    "DEMO_PASSWORD": {
+      "description": "Practice account password shared separately with authorized testers.",
+      "required": true
+    }
+  },
+  "scripts": {
+    "test": "bin/rails db:test:prepare test"
+  }
+}

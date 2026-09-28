@@ -1,0 +1,44 @@
+<% content_for :title, "#{@view == "mine" ? "My Tasks" : "Task Board"} · AERO Task Hub" %>
+
+<div class="page-heading">
+  <div>
+    <p class="eyebrow"><%= current_user.team&.name || "ALL TEAMS" %></p>
+    <h1><%= @view == "mine" ? "My Tasks" : "Task Board" %></h1>
+  </div>
+  <div class="segmented" aria-label="Task view">
+    <%= link_to "Board", tasks_path, class: @view == "board" ? "active" : nil %>
+    <%= link_to "My Tasks", tasks_path(view: "mine"), class: @view == "mine" ? "active" : nil %>
+  </div>
+</div>
+
+<% if @tasks.any? %>
+  <div class="task-board">
+    <% Task.statuses.each_key do |status| %>
+      <section class="task-column" aria-labelledby="<%= status %>-heading">
+        <div class="column-heading">
+          <h2 id="<%= status %>-heading"><%= status.humanize %></h2>
+          <span><%= @tasks.count { |task| task.status == status } %></span>
+        </div>
+        <% @tasks.select { |task| task.status == status }.each do |task| %>
+          <article class="task-card">
+            <div class="task-meta">
+              <span><%= task.team.name %></span>
+              <span><%= task.due_date&.to_fs(:short) || "No due date" %></span>
+            </div>
+            <h3><%= link_to task.title, task %></h3>
+            <p><%= truncate(task.description, length: 110) %></p>
+            <div class="task-foot">
+              <span><%= task.assignees.map(&:name).to_sentence.presence || "Unassigned" %></span>
+              <strong><%= number_with_precision(task.total_actual_hours, precision: 1, strip_insignificant_zeros: true) %>/<%= number_with_precision(task.estimated_hours, precision: 1, strip_insignificant_zeros: true) %>h</strong>
+            </div>
+          </article>
+        <% end %>
+      </section>
+    <% end %>
+  </div>
+<% else %>
+  <div class="panel empty-state">
+    <h2>No tasks found</h2>
+    <p><%= @view == "mine" ? "No tasks are assigned to you." : "There are no permitted tasks on this board." %></p>
+  </div>
+<% end %>

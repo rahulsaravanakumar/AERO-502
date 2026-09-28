@@ -1,0 +1,13 @@
+wing_hours:
+  task: wing_test
+  user: member
+  hours: 2.5
+  note: Fixture setup
+  worked_on: 2026-09-27
+
+spar_hours:
+  task: spar_check
+  user: other_member
+  hours: 1.5
+  note: Drawing review
+  worked_on: 2026-09-27

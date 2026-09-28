@@ -6,13 +6,14 @@ Canvas requires the Sprint 1 increment in the customer's Heroku account. Deploym
 
 1. Have the Chief Engineer or authorized organization owner create the Heroku application.
 2. Add Heroku Postgres to the application.
-3. Add the GitHub repository as the deployment source, or add the Heroku Git remote.
-4. Set `RAILS_MASTER_KEY` from `config/master.key` through Heroku Config Vars. Do not commit or paste it into documentation.
-5. Set `DEMO_PASSWORD` to an approved practice password shared separately with testers.
-6. Deploy the reviewed `main` commit. The `release` Procfile command runs `bin/rails db:migrate`.
-7. Run `heroku run bin/rails db:seed -a APP_NAME` for agreed practice records.
-8. Open `https://APP_NAME.herokuapp.com/up`, then perform the role and task smoke tests.
-9. Record the application URL, commit SHA, Heroku owner, add-ons, and current recurring price in the project notebook.
+3. Connect `https://github.com/rahulsaravanakumar/AERO-502` in the Heroku app's Deploy tab.
+4. Select `main` for production and enable automatic deploys only with **Wait for CI to pass before deploy** enabled. Use `test` for a separate review/staging app.
+5. Set `RAILS_MASTER_KEY` from `config/master.key` through Heroku Config Vars. Do not commit or paste it into documentation.
+6. Set `DEMO_PASSWORD` to an approved practice password shared separately with testers.
+7. Deploy the reviewed `main` commit. The `release` Procfile command runs `bin/rails db:migrate`.
+8. Run `heroku run bin/rails db:seed -a APP_NAME` for agreed practice records.
+9. Open `https://APP_NAME.herokuapp.com/up`, then perform the role and task smoke tests.
+10. Record the application URL, commit SHA, Heroku owner, add-ons, and current recurring price in the project notebook.
 
 Pricing changes over time. Capture the active plan and recurring cost from the organization's Heroku dashboard at submission time; do not rely on an old price copied into this repository.
 

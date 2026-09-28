@@ -13,7 +13,7 @@ A Vivify Scrum-style, role-aware task and effort tracker for the SAE AERO Design
 
 ## Local setup
 
-Requirements: Ruby 3.4.6, Rails 8.1, PostgreSQL, and Bundler.
+Requirements: Ruby 4.0.6, Rails 8.1, PostgreSQL, and Bundler 4.0.16.
 
 ```sh
 bundle install

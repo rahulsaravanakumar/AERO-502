@@ -18,7 +18,7 @@ Pricing changes over time. Capture the active plan and recurring cost from the o
 
 ## Required environment
 
-- Ruby 3.4.6
+- Ruby 4.0.6
 - PostgreSQL through `DATABASE_URL`
 - `RAILS_MASTER_KEY`
 - Optional `DEMO_PASSWORD`

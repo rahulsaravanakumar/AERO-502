@@ -35,4 +35,4 @@
 - Controllers coordinate requests while models own validation, relationships, totals, and access scopes.
 - Reusable partials and centralized CSS avoid duplicated form and layout logic.
 - Migrations, seeds, health endpoint, CI, deployment, backup, rollback, and training instructions are versioned with the code.
-- The automated coverage gate is 80%; the team should add regression tests with each change and work toward its stated 100% target.
+- RSpec runs model and request specs; SimpleCov enforces 100% line coverage.

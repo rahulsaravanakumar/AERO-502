@@ -47,7 +47,7 @@
         <h2>Record actual hours</h2>
         <%= form_with model: [@task, @time_entry], class: "inline-form" do |form| %>
           <%= form.label :hours %>
-          <%= form.number_field :hours, min: 0.01, step: 0.25, required: true %>
+          <%= form.number_field :hours, min: 0.01, step: 0.01, required: true %>
           <%= form.label :worked_on, "Date worked" %>
           <%= form.date_field :worked_on, required: true %>
           <%= form.label :note, "Note (optional)" %>

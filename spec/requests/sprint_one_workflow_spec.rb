@@ -1,67 +1,67 @@
-require "test_helper"
+require "rails_helper"
 
-class SprintOneWorkflowTest < ActionDispatch::IntegrationTest
-     test "protected pages request sign in" do
+RSpec.describe "Sprint 1 workflow", type: :request do
+     it "protected pages request sign in" do
           get tasks_path
 
-          assert_redirected_to login_path
+          expect(response).to redirect_to(login_path)
      end
 
-     test "valid credentials open the role-aware dashboard" do
+     it "valid credentials open the role-aware dashboard" do
           sign_in(users(:member))
 
-          assert_redirected_to root_path
+          expect(response).to redirect_to(root_path)
           follow_redirect!
-          assert_response :success
-          assert_includes response.body, "Wing load test"
-          assert_not_includes response.body, "Verify spar dimensions"
+          expect(response).to have_http_status(:success)
+          expect(response.body).to include("Wing load test")
+          expect(response.body).not_to include("Verify spar dimensions")
      end
 
-     test "incorrect password is refused with a clear message" do
+     it "incorrect password is refused with a clear message" do
           post login_path, params: { email: users(:member).email, password: "wrong" }
 
-          assert_response :unprocessable_entity
-          assert_includes response.body, "Email or password is incorrect"
+          expect(response).to have_http_status(:unprocessable_content)
+          expect(response.body).to include("Email or password is incorrect")
      end
 
-     test "member cannot retrieve another team's task directly" do
+     it "member cannot retrieve another team's task directly" do
           sign_in(users(:member))
 
           get task_path(tasks(:spar_check))
 
-          assert_redirected_to root_path
+          expect(response).to redirect_to(root_path)
      end
 
-     test "assigned member updates status and records hours" do
+     it "assigned member updates status and records hours" do
           sign_in(users(:member))
 
           patch task_path(tasks(:wing_test)), params: { task: { status: "in_progress" } }
-          assert_redirected_to task_path(tasks(:wing_test))
-          assert tasks(:wing_test).reload.in_progress?
+          expect(response).to redirect_to(task_path(tasks(:wing_test)))
+          expect(tasks(:wing_test).reload.in_progress?).to be_truthy
 
-          assert_difference("TimeEntry.count", 1) do
+          expect do
                post task_time_entries_path(tasks(:wing_test)), params: {
                     time_entry: { hours: 1.5, worked_on: Date.current, note: "Test run" }
                }
-          end
+          end.to change(TimeEntry, :count).by(1)
      end
 
-     test "negative hours are rejected and previous total remains" do
+     it "negative hours are rejected and previous total remains" do
           sign_in(users(:member))
           previous_total = tasks(:wing_test).total_actual_hours
 
-          assert_no_difference("TimeEntry.count") do
+          expect do
                post task_time_entries_path(tasks(:wing_test)), params: {
                     time_entry: { hours: -1, worked_on: Date.current }
                }
-          end
-          assert_equal previous_total, tasks(:wing_test).reload.total_actual_hours
+          end.not_to change(TimeEntry, :count)
+          expect(tasks(:wing_test).reload.total_actual_hours).to eq(previous_total)
      end
 
-     test "team officer creates and assigns a complete task card" do
+     it "team officer creates and assigns a complete task card" do
           sign_in(users(:officer))
 
-          assert_difference([ "Task.count", "TaskAssignment.count" ], 1) do
+          expect do
                post tasks_path, params: {
                     task: {
                          title: "Control surface check",
@@ -76,20 +76,20 @@ class SprintOneWorkflowTest < ActionDispatch::IntegrationTest
                          assignee_ids: [ users(:member).id ]
                     }
                }
-          end
+          end.to change(Task, :count).by(1).and change(TaskAssignment, :count).by(1)
 
           task = Task.order(:created_at).last
-          assert_redirected_to task_path(task)
-          assert_equal teams(:aerodynamics), task.team
-          assert_equal [ users(:member) ], task.assignees
+          expect(response).to redirect_to(task_path(task))
+          expect(task.team).to eq(teams(:aerodynamics))
+          expect(task.assignees).to eq([ users(:member) ])
      end
 
-     test "officer cannot edit another team's task" do
+     it "officer cannot edit another team's task" do
           sign_in(users(:officer))
 
           get edit_task_path(tasks(:spar_check))
 
-          assert_redirected_to root_path
+          expect(response).to redirect_to(root_path)
      end
 
      private

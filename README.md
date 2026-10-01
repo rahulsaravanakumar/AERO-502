@@ -27,12 +27,12 @@ Open http://localhost:3000. The practice password defaults to `AeroSprint1!` and
 ## Verification
 
 ```sh
-bin/rails test
+bundle exec rspec
 bin/rubocop
 bin/brakeman --no-pager
 ```
 
-SimpleCov enforces at least 80% test coverage. GitHub Actions runs tests with PostgreSQL, RuboCop, Brakeman, and the import-map audit.
+SimpleCov enforces 100% line coverage. GitHub Actions runs RSpec with PostgreSQL, RuboCop, Brakeman, and the import-map audit.
 
 ## Documentation
 

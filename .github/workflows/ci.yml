@@ -90,12 +90,14 @@ jobs:
           RAILS_ENV: test
           DATABASE_URL: postgres://postgres:postgres@localhost:5432
           # REDIS_URL: redis://localhost:6379/0
-        run: bin/rails db:test:prepare test test:system
+        run: |
+          bin/rails db:test:prepare
+          bundle exec rspec
 
-      - name: Keep screenshots from failed system tests
+      - name: Keep RSpec coverage report
         uses: actions/upload-artifact@v4
-        if: failure()
+        if: always()
         with:
-          name: screenshots
-          path: ${{ github.workspace }}/tmp/screenshots
+          name: rspec-coverage
+          path: coverage/
           if-no-files-found: ignore

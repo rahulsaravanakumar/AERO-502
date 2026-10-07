@@ -5,9 +5,10 @@ class DashboardSummary
 
      attr_reader :project, :from, :to, :errors
 
-     def initialize(user:, project:, from: nil, to: nil)
+     def initialize(user:, project:, filter: TaskFilter.new, from: nil, to: nil)
           @user = user
           @project = project
+          @filter = filter
           @errors = []
           @from = parse_date(from, "Start date")
           @to = parse_date(to, "End date")
@@ -18,7 +19,7 @@ class DashboardSummary
      end
 
      def tasks
-          @tasks ||= Task.accessible_to(@user).where(project: project)
+          @tasks ||= @filter.apply(Task.accessible_to(@user)).where(project: project)
                          .includes(:team, :assignees, time_entries: :user).order(:due_date, :title).to_a
      end
 

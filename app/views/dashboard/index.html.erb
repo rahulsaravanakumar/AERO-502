@@ -22,9 +22,12 @@
     <%= form.label :to, "Hours to" %>
     <%= form.date_field :to, value: @summary.to %>
   </div>
+  <%= fields :filter do |filter_form| %>
+    <%= render "tasks/filter_fields", form: filter_form %>
+  <% end %>
   <div class="filter-actions">
     <%= form.submit "Apply", class: "button", name: nil %>
-    <%= link_to "Clear", dashboard_path, class: "button button-secondary" %>
+    <%= link_to "Clear", dashboard_path(filter: { q: "" }), class: "button button-secondary" %>
   </div>
 <% end %>
 
@@ -136,7 +139,7 @@
   </figure>
 </section>
 
-<section class="panel">
+<section class="panel" data-task-overview>
   <div class="section-heading">
     <h2>Task overview</h2>
     <%= link_to "Open full board", tasks_path %>

@@ -11,7 +11,23 @@
   </div>
 </div>
 
-<% if @tasks.any? %>
+<%= form_with scope: :filter, url: tasks_path, method: :get, class: "panel filter-bar", aria: { label: "Search and filter tasks" } do |form| %>
+  <% if @view == "mine" %>
+    <%= hidden_field_tag :view, "mine", id: nil %>
+  <% end %>
+  <%= render "tasks/filter_fields", form: form %>
+  <div class="filter-actions">
+    <%= form.submit "Apply", class: "button", name: nil %>
+    <%= link_to "Clear", tasks_path(view: (@view if @view == "mine"), filter: { q: "" }), class: "button button-secondary" %>
+  </div>
+<% end %>
+
+<% if @tasks.none? && task_filter.active? && Task.accessible_to(current_user).exists? %>
+  <div class="panel empty-state">
+    <h2>No tasks found</h2>
+    <p>No tasks match your search or filters.</p>
+  </div>
+<% elsif @tasks.any? %>
   <div class="task-board">
     <% Task.statuses.each_key do |status| %>
       <section class="task-column" aria-labelledby="<%= status %>-heading">

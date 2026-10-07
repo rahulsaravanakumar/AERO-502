@@ -1,4 +1,6 @@
 class TasksController < ApplicationController
+     include TaskFiltering
+
      OWN_TEAM_ONLY = "You can manage only tasks on your own team.".freeze
 
      before_action :require_sign_in
@@ -8,9 +10,9 @@ class TasksController < ApplicationController
      before_action :ensure_can_manage_task, only: %i[edit destroy]
 
      def index
-          @tasks = Task.accessible_to(current_user)
-                       .includes(:project, :team, :assignees, :time_entries)
-                       .order(:status, :due_date, :title)
+          @tasks = task_filter.apply(Task.accessible_to(current_user))
+                              .includes(:project, :team, :assignees, :time_entries)
+                              .order(:status, :due_date, :title)
           @view = params[:view] == "mine" ? "mine" : "board"
           if @view == "mine"
                @tasks = @tasks.joins(:task_assignments)

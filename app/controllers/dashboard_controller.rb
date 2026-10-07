@@ -1,11 +1,14 @@
 class DashboardController < ApplicationController
+     include TaskFiltering
+
      before_action :require_sign_in
      before_action :ensure_leader
 
      def index
           @projects = Project.active.order(:name)
           project = Project.find_by(id: params[:project_id]) || default_project
-          @summary = DashboardSummary.new(user: current_user, project: project, from: params[:from], to: params[:to])
+          @summary = DashboardSummary.new(user: current_user, project: project, filter: task_filter,
+                                          from: params[:from], to: params[:to])
      end
 
      private

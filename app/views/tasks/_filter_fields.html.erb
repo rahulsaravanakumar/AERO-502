@@ -1,0 +1,13 @@
+<%# Search and team/subteam filters; rendered inside a GET form scoped to :filter. %>
+<div class="field filter-search">
+  <%= form.label :q, "Search tasks" %>
+  <%= form.search_field :q, value: task_filter.query, placeholder: "Title or description" %>
+</div>
+<div class="field">
+  <%= form.label :team_id, "Team" %>
+  <%= form.select :team_id, options_from_collection_for_select(Team.active.order(:name), :id, :name, task_filter.team_id), include_blank: "All teams" %>
+</div>
+<div class="field">
+  <%= form.label :subteam_id, "Subteam" %>
+  <%= form.select :subteam_id, option_groups_from_collection_for_select(Team.active.order(:name), :active_subteams, :name, :id, :name, task_filter.subteam_id), include_blank: "All subteams" %>
+</div>

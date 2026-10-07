@@ -128,6 +128,21 @@ RSpec.describe "Organization management", type: :request do
           expect(response).to redirect_to(organization_path)
      end
 
+     it "groups each record's Rename and Archive actions in a Manage menu and shows counts per team" do
+          sign_in(users(:chief))
+          get organization_path
+
+          card = response.parsed_body.at_css("[data-team='#{teams(:aerodynamics).id}']")
+          expect(card.at_css(".org-team-header").text.squish).to include("1 subteam · 2 projects")
+          menus = card.css("details.manage-menu")
+          expect(menus.size).to eq(4)
+          menus.each do |menu|
+               expect(menu.at_css("summary").text.squish).to start_with("Manage")
+               expect(menu.css("a, button").map { |control| control.text.strip }).to eq([ "Rename", "Archive" ])
+          end
+          expect(card.css("a.add-action").map(&:text).map(&:squish)).to eq([ "+ Add project", "+ Add subteam" ])
+     end
+
      it "keeps a record's parent fixed after creation so its tasks stay consistent" do
           sign_in(users(:chief))
           patch project_path(projects(:aero)), params: { project: { subteam_id: subteams(:airframe).id } }

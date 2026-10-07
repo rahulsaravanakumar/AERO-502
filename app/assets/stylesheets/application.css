@@ -210,14 +210,33 @@ thead th { color: var(--muted); font-size: .78rem; letter-spacing: .06em; text-t
 @media (max-width: 640px) { .bar-row { grid-template-columns: 1fr; gap: .3rem; } }
 
 /* Organization screen */
-.org-teams { display: grid; grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
-.org-team .section-heading { margin-bottom: .25rem; }
-.org-team h2 { margin: 0; font-size: 1.35rem; }
-.org-subteam-block { margin-top: 1rem; padding-top: .75rem; border-top: 1px solid var(--line); }
-.org-subteam-block h3 { margin: 0; font-size: 1.05rem; }
+.org-teams { display: grid; grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem; align-items: start; }
+.org-team { padding: 1.25rem 1.4rem; }
+.org-team-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; padding-bottom: .9rem; border-bottom: 2px solid var(--maroon); }
+.org-team-header h2 { margin: 0 0 .2rem; font-size: 1.45rem; }
+.org-team-header p { margin: 0; font-size: .9rem; }
+.org-name { color: var(--ink); text-decoration: none; }
+.org-name:hover, .org-name:focus-visible { color: var(--maroon); text-decoration: underline; }
+.org-subteam { margin-top: 1rem; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.org-subteam-header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: .55rem .85rem; background: var(--cream); }
+.org-subteam-header h3 { margin: 0; font-size: 1rem; text-transform: uppercase; letter-spacing: .04em; }
+.org-projects { margin: 0; padding: .25rem 0; list-style: none; }
+.org-projects li { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: .45rem .85rem .45rem 1.6rem; position: relative; }
+.org-projects li::before { content: ""; position: absolute; left: .85rem; top: 50%; width: .35rem; height: .35rem; border-radius: 50%; background: var(--muted); }
+.org-projects li + li { border-top: 1px solid var(--line); }
+.org-empty { margin: .5rem .85rem; font-size: .9rem; }
+.add-action { display: inline-block; font-size: .88rem; font-weight: 700; color: var(--maroon); text-decoration: none; }
+.add-action:hover, .add-action:focus-visible { text-decoration: underline; }
+.add-project { margin: .2rem .85rem .7rem; }
+.add-subteam { margin-top: 1rem; padding: .45rem .9rem; border: 1px dashed var(--maroon); border-radius: 8px; }
 .org-row, .plain-list li.org-row { display: flex; flex-direction: row; justify-content: space-between; align-items: center; gap: 1rem; }
-.org-projects li { padding: .45rem 0 .45rem .9rem; }
-.add-link { display: inline-block; margin-top: .6rem; font-weight: 700; }
+.manage-menu { position: relative; flex-shrink: 0; }
+.manage-menu summary { cursor: pointer; list-style: none; padding: .15rem .55rem; border: 1px solid var(--line); border-radius: 6px; font-size: .82rem; color: var(--muted); background: var(--paper); }
+.manage-menu summary::-webkit-details-marker { display: none; }
+.manage-menu summary::after { content: " \25BE"; }
+.manage-menu[open] summary, .manage-menu summary:hover, .manage-menu summary:focus-visible { color: var(--maroon); border-color: var(--maroon); }
+.manage-items { position: absolute; right: 0; z-index: 5; display: flex; flex-direction: column; gap: .4rem; min-width: 8rem; margin-top: .3rem; padding: .6rem .8rem; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); box-shadow: var(--shadow); }
+.manage-items .link-button { color: var(--maroon); text-align: left; text-underline-offset: 0.2em; }
 
 /* In-app user guide */
 .guide { max-width: 60rem; }

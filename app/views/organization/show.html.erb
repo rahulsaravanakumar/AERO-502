@@ -4,7 +4,7 @@
   <div>
     <p class="eyebrow">ADMINISTRATION</p>
     <h1>Teams, subteams and projects</h1>
-    <p class="lede">Each class (team) has subteams, and each subteam has projects. Tasks belong to a project. Archived groups leave everyday lists but keep their tasks and hours.</p>
+    <p class="lede">Each class (team) has subteams, and each subteam has projects. Tasks belong to a project. Select any name to see its tasks and hours.</p>
   </div>
   <% if current_user.chief_engineer? %>
     <%= link_to "New team", new_team_path, class: "button" %>
@@ -14,41 +14,43 @@
 <% if @teams.any? %>
   <div class="org-teams">
     <% @teams.each do |team| %>
+      <% subteams = team.subteams.reject(&:archived?).sort_by(&:name) %>
+      <% project_count = subteams.sum { |subteam| subteam.projects.count { |project| !project.archived? } } %>
       <article class="panel org-team" data-team="<%= team.id %>">
-        <div class="section-heading">
-          <h2><%= link_to team.name, team_path(team) %></h2>
+        <header class="org-team-header">
+          <div>
+            <h2><%= link_to team.name, team_path(team), class: "org-name" %></h2>
+            <p class="muted"><%= pluralize(subteams.size, "subteam") %> · <%= pluralize(project_count, "project") %></p>
+          </div>
           <% if current_user.chief_engineer? %>
-            <div class="row-actions">
-              <%= link_to "Rename", edit_team_path(team), aria: { label: "Rename team #{team.name}" } %>
-              <%= button_to "Archive", archive_team_path(team), method: :patch, class: "link-button", aria: { label: "Archive team #{team.name}" } %>
-            </div>
+            <%= render "manage_menu", label: "team #{team.name}", edit_path: edit_team_path(team), archive_path: archive_team_path(team) %>
           <% end %>
-        </div>
+        </header>
 
-        <% team.subteams.select { |subteam| !subteam.archived? }.sort_by(&:name).each do |subteam| %>
-          <section class="org-subteam-block" data-subteam="<%= subteam.id %>">
-            <div class="org-row">
-              <h3><%= link_to subteam.name, subteam_path(subteam) %></h3>
-              <div class="row-actions">
-                <%= link_to "Rename", edit_subteam_path(subteam), aria: { label: "Rename subteam #{subteam.full_name}" } %>
-                <%= button_to "Archive", archive_subteam_path(subteam), method: :patch, class: "link-button", aria: { label: "Archive subteam #{subteam.full_name}" } %>
-              </div>
+        <% subteams.each do |subteam| %>
+          <section class="org-subteam" data-subteam="<%= subteam.id %>">
+            <div class="org-subteam-header">
+              <h3><%= link_to subteam.name, subteam_path(subteam), class: "org-name" %></h3>
+              <%= render "manage_menu", label: "subteam #{subteam.full_name}", edit_path: edit_subteam_path(subteam), archive_path: archive_subteam_path(subteam) %>
             </div>
-            <ul class="plain-list org-projects">
-              <% subteam.projects.select { |project| !project.archived? }.sort_by(&:name).each do |project| %>
-                <li class="org-row">
-                  <%= link_to project.name, project_path(project) %>
-                  <div class="row-actions">
-                    <%= link_to "Rename", edit_project_path(project), aria: { label: "Rename project #{project.full_name}" } %>
-                    <%= button_to "Archive", archive_project_path(project), method: :patch, class: "link-button", aria: { label: "Archive project #{project.full_name}" } %>
-                  </div>
-                </li>
-              <% end %>
-            </ul>
-            <%= link_to "Add project", new_project_path(subteam_id: subteam.id), class: "add-link", aria: { label: "Add project to #{subteam.full_name}" } %>
+            <% projects = subteam.projects.reject(&:archived?).sort_by(&:name) %>
+            <% if projects.any? %>
+              <ul class="org-projects">
+                <% projects.each do |project| %>
+                  <li>
+                    <%= link_to project.name, project_path(project), class: "org-name" %>
+                    <%= render "manage_menu", label: "project #{project.full_name}", edit_path: edit_project_path(project), archive_path: archive_project_path(project) %>
+                  </li>
+                <% end %>
+              </ul>
+            <% else %>
+              <p class="muted org-empty">No projects yet.</p>
+            <% end %>
+            <%= link_to "+ Add project", new_project_path(subteam_id: subteam.id), class: "add-action add-project", aria: { label: "Add project to #{subteam.full_name}" } %>
           </section>
         <% end %>
-        <%= link_to "Add subteam", new_subteam_path(team_id: team.id), class: "add-link", aria: { label: "Add subteam to #{team.name}" } %>
+
+        <%= link_to "+ Add subteam", new_subteam_path(team_id: team.id), class: "add-action add-subteam", aria: { label: "Add subteam to #{team.name}" } %>
       </article>
     <% end %>
   </div>

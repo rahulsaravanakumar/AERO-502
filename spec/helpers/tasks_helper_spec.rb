@@ -1,6 +1,17 @@
 require "rails_helper"
 
 RSpec.describe TasksHelper, type: :helper do
+     describe "#external_link" do
+          it "links http and https addresses in a new tab" do
+               link = Nokogiri::HTML.fragment(helper.external_link("https://example.com/a")).at_css("a")
+               expect(link.to_h).to include("href" => "https://example.com/a", "target" => "_blank", "rel" => "noopener")
+          end
+
+          it "shows any other address as plain text" do
+               expect(helper.external_link("javascript:alert(1)")).to eq("javascript:alert(1)")
+          end
+     end
+
      describe "#estimate_label" do
           it "labels a missing legacy estimate as Not estimated" do
                expect(helper.estimate_label(nil)).to eq("Not estimated")

@@ -27,7 +27,7 @@
           <% if @task.links.any? %>
             <ul class="link-list">
               <% @task.links.each do |link| %>
-                <li><%= link_to link.url, link.url, target: "_blank", rel: "noopener" %></li>
+                <li><%= external_link(link.url) %></li>
               <% end %>
             </ul>
           <% else %>

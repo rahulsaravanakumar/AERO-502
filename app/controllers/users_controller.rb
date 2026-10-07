@@ -11,7 +11,10 @@ class UsersController < ApplicationController
      end
 
      def update
-          if @user.update(user_params)
+          @user.assign_attributes(user_params)
+          # Only the Chief Engineer reaches this action (see ensure_chief_engineer).
+          @user.role = params.require(:user).fetch(:role, @user.role)
+          if @user.save
                redirect_to users_path, notice: "#{@user.name} is now #{@user.role_with_article}."
           else
                render :edit, status: :unprocessable_entity
@@ -29,6 +32,6 @@ class UsersController < ApplicationController
      end
 
      def user_params
-          params.require(:user).permit(:role, :team_id, :subteam_id)
+          params.require(:user).permit(:team_id, :subteam_id)
      end
 end

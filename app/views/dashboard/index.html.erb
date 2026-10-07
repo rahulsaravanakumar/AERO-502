@@ -59,7 +59,7 @@
               <td><span class="badge status-<%= task.status %>"><%= task.status.humanize %></span></td>
               <td><%= number_with_precision(task.estimated_hours, precision: 2, strip_insignificant_zeros: true) %>h</td>
               <td><%= number_with_precision(task.total_actual_hours, precision: 2, strip_insignificant_zeros: true) %>h</td>
-              <td><%= task.due_date&.to_fs(:long) || "No date" %></td>
+              <td><%= task.due_date.to_fs(:long) %></td>
             </tr>
           <% end %>
         </tbody>

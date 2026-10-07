@@ -109,6 +109,9 @@ input:focus, select:focus, textarea:focus, a:focus-visible, button:focus-visible
 .check-option { display: flex; align-items: center; gap: .6rem; padding: .7rem; border: 1px solid var(--line); border-radius: 8px; }
 .check-option input { width: 20px; min-height: 20px; }
 .form-actions { display: flex; gap: .75rem; }
+.field-error { margin: 0; color: #a22929; font-weight: 700; font-size: .92rem; }
+[aria-invalid="true"] { border-color: #a22929; }
+.link-list { margin: 0; padding-left: 1.1rem; overflow-wrap: anywhere; }
 .error-summary { margin-bottom: 1.5rem; padding: 1rem; border-left: 5px solid #a22929; background: #fff0ef; }
 
 .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem; }

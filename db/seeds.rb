@@ -37,7 +37,8 @@ wing_task.update!(
      creator: officer_a,
      description: "Complete the load-test worksheet and attach a reviewed summary.",
      instructions: "Use the approved test fixture. Record each run and flag any result outside tolerance.",
-     link_url: "https://example.com/wing-load-test",
+     reference_links_text: "https://example.com/wing-load-test",
+     start_date: Date.current - 3,
      due_date: 10.days.from_now.to_date,
      estimated_hours: 10,
      status: :in_progress
@@ -48,14 +49,16 @@ backlog_task = Task.find_or_initialize_by(project: project, title: "Review airfo
 backlog_task.update!(team: team_a, creator: officer_a,
                      description: "Compare the three shortlisted airfoils.",
                      instructions: "Summarize lift, drag, and manufacturability tradeoffs.",
-                     due_date: 14.days.from_now.to_date, estimated_hours: 6, status: :backlog)
+                     start_date: Date.current, due_date: 14.days.from_now.to_date,
+                     estimated_hours: 6, status: :backlog)
 backlog_task.assignee_ids = [ member_a.id ]
 
 completed_task = Task.find_or_initialize_by(project: project, title: "Verify spar dimensions")
 completed_task.update!(team: team_b, creator: officer_b,
                        description: "Confirm the current spar dimensions against the drawing.",
                        instructions: "Record the drawing revision used.",
-                       due_date: 2.days.ago.to_date, estimated_hours: 4, status: :completed)
+                       start_date: 9.days.ago.to_date, due_date: 2.days.ago.to_date,
+                       estimated_hours: 4, status: :completed)
 completed_task.assignee_ids = [ member_c.id ]
 
 TimeEntry.find_or_create_by!(task: wing_task, user: member_a, hours: 2.5,

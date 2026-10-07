@@ -26,7 +26,7 @@ class TasksController < ApplicationController
      end
 
      def create
-          @task = Task.new(task_params.except(:assignee_ids))
+          @task = Task.new(task_params.except(:assignee_ids, :status))
           @task.creator = current_user
           restrict_task_to_officer_team
 
@@ -96,7 +96,7 @@ class TasksController < ApplicationController
 
      def task_params
           params.require(:task).permit(
-               :title, :description, :instructions, :link_url, :due_date,
+               :title, :description, :instructions, :reference_links_text, :start_date, :due_date,
                :estimated_hours, :status, :project_id, :team_id, :subteam_id,
                assignee_ids: []
           )

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_09_27_224361) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_07_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -40,12 +40,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_27_224361) do
     t.index ["user_id"], name: "index_task_assignments_on_user_id"
   end
 
+  create_table "task_links", force: :cascade do |t|
+    t.bigint "task_id", null: false
+    t.string "url", null: false
+    t.integer "position", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["task_id"], name: "index_task_links_on_task_id"
+  end
+
   create_table "tasks", force: :cascade do |t|
     t.string "title", null: false
     t.text "description"
     t.text "instructions"
-    t.string "link_url"
-    t.date "due_date"
+    t.date "due_date", null: false
     t.decimal "estimated_hours", precision: 7, scale: 2, null: false
     t.integer "status", default: 0, null: false
     t.bigint "project_id", null: false
@@ -54,6 +62,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_27_224361) do
     t.bigint "creator_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.date "start_date", null: false
     t.index ["creator_id"], name: "index_tasks_on_creator_id"
     t.index ["project_id"], name: "index_tasks_on_project_id"
     t.index ["subteam_id"], name: "index_tasks_on_subteam_id"
@@ -96,6 +105,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_27_224361) do
   add_foreign_key "subteams", "teams"
   add_foreign_key "task_assignments", "tasks"
   add_foreign_key "task_assignments", "users"
+  add_foreign_key "task_links", "tasks"
   add_foreign_key "tasks", "projects"
   add_foreign_key "tasks", "subteams"
   add_foreign_key "tasks", "teams"

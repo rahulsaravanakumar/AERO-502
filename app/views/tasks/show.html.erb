@@ -19,8 +19,22 @@
       <div><dt>Work instructions</dt><dd><%= simple_format(@task.instructions.presence || "No additional instructions.") %></dd></div>
       <div><dt>Assigned members</dt><dd><%= @task.assignees.map(&:name).to_sentence.presence || "Unassigned" %></dd></div>
       <div data-estimate><dt>Estimated hours</dt><dd><%= estimate_label(@task.estimated_hours) %></dd></div>
-      <div><dt>Due date</dt><dd><%= @task.due_date&.to_fs(:long) || "No date" %></dd></div>
-      <div><dt>Supporting link</dt><dd><%= @task.link_url.present? ? link_to("Open resource", ERB::Util.html_escape(@task.link_url), target: "_blank", rel: "noopener") : "None" %></dd></div>
+      <div><dt>Start date</dt><dd><%= @task.start_date.to_fs(:long) %></dd></div>
+      <div><dt>Due date</dt><dd><%= @task.due_date.to_fs(:long) %></dd></div>
+      <div>
+        <dt>Reference links</dt>
+        <dd>
+          <% if @task.links.any? %>
+            <ul class="link-list">
+              <% @task.links.each do |link| %>
+                <li><%= link_to link.url, link.url, target: "_blank", rel: "noopener" %></li>
+              <% end %>
+            </ul>
+          <% else %>
+            None
+          <% end %>
+        </dd>
+      </div>
     </dl>
   </section>
 

@@ -46,6 +46,7 @@ class TasksController < ApplicationController
           return update_status_as_member unless current_user.can_manage?(@task)
 
           @task.assign_attributes(task_params.except(:assignee_ids))
+          @task.acting_user = current_user
           restrict_task_to_officer_team
 
           if save_task_with_assignments
@@ -86,6 +87,7 @@ class TasksController < ApplicationController
                return deny_access("You can update only tasks assigned to you.")
           end
 
+          @task.acting_user = current_user
           if @task.update(params.require(:task).permit(:status))
                redirect_to @task, notice: "Task status was updated."
           else

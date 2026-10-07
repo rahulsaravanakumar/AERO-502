@@ -11,8 +11,12 @@ class Task < ApplicationRecord
      has_many :time_entries, dependent: :destroy
      has_many :links, -> { order(:position, :id) }, class_name: "TaskLink", dependent: :destroy,
                                                     inverse_of: :task
+     has_many :events, class_name: "TaskEvent", dependent: :delete_all
 
-     enum :status, { backlog: 0, in_progress: 1, completed: 2 }
+     enum :status, { backlog: 0, in_progress: 1, completed: 2 }, validate: true
+
+     # The signed-in user making a change, recorded on the task's history.
+     attr_accessor :acting_user
 
      attribute :start_date, :date, default: -> { Date.current }
 
@@ -24,6 +28,7 @@ class Task < ApplicationRecord
      validate :reference_links_are_web_addresses
 
      after_save :replace_links, if: -> { @reference_urls }
+     after_update :record_status_change, if: :saved_change_to_status?
 
      scope :accessible_to, lambda { |user|
           if user.chief_engineer?
@@ -84,6 +89,12 @@ class Task < ApplicationRecord
           uri.is_a?(URI::HTTP) && uri.host.present?
      rescue URI::InvalidURIError
           false
+     end
+
+     def record_status_change
+          from_status, to_status = saved_change_to_status
+          TaskEvent.create!(task: self, actor: acting_user, action: "status_changed",
+                            from_status: from_status, to_status: to_status)
      end
 
      def replace_links

@@ -62,7 +62,7 @@
         <h2>Record actual hours</h2>
         <%= form_with model: [@task, @time_entry], class: "inline-form" do |form| %>
           <%= form.label :hours %>
-          <%= form.number_field :hours, min: 0.01, step: 0.01, required: true %>
+          <%= form.number_field :hours, min: 0.01, max: TimeEntry::MAX_HOURS_PER_DAY, step: 0.01, required: true %>
           <%= form.label :worked_on, "Date worked" %>
           <%= form.date_field :worked_on, required: true %>
           <%= form.label :note, "Note (optional)" %>
@@ -84,6 +84,39 @@
           <strong><%= number_with_precision(@task.actual_hours_for(member), precision: 2, strip_insignificant_zeros: true) %> hours</strong>
         </article>
       <% end %>
+    </div>
+
+    <h3 class="subsection-heading">Time entries</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Date worked</th>
+            <th scope="col">Member</th>
+            <th scope="col">Hours</th>
+            <th scope="col">Note</th>
+            <th scope="col"><span class="visually-hidden">Actions</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @task.time_entries.includes(:user).order(worked_on: :desc, id: :desc).each do |entry| %>
+            <tr data-time-entry>
+              <td><%= entry.worked_on.to_fs(:long) %></td>
+              <td><%= entry.user.name %></td>
+              <td><%= estimate_label(entry.hours) %></td>
+              <td><%= entry.note %></td>
+              <td>
+                <% if entry.user_id == current_user.id %>
+                  <div class="row-actions">
+                    <%= link_to "Edit", edit_time_entry_path(entry) %>
+                    <%= button_to "Delete", time_entry_path(entry), method: :delete, class: "link-button" %>
+                  </div>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
     </div>
   <% else %>
     <p class="muted">No actual hours have been recorded.</p>

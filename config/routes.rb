@@ -6,7 +6,7 @@ Rails.application.routes.draw do
      delete "logout", to: "sessions#destroy"
 
      resources :tasks do
-          resources :time_entries, only: :create
+          resources :time_entries, only: %i[create edit update destroy], shallow: true
      end
 
      get "up" => "rails/health#show", as: :rails_health_check

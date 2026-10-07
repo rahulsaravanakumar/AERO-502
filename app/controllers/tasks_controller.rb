@@ -123,11 +123,13 @@ class TasksController < ApplicationController
           false
      end
 
+     # Everyday lists show active groups, plus the task's current ones when editing.
      def prepare_form
-          @projects = Project.order(:name)
-          @teams = current_user.chief_engineer? ? Team.order(:name) : Team.where(id: current_user.team_id)
+          @projects = Project.active.or(Project.where(id: @task.project_id)).order(:name)
+          teams = current_user.chief_engineer? ? Team.all : Team.where(id: current_user.team_id)
+          @teams = teams.active.or(teams.where(id: @task.team_id)).order(:name)
           team_ids = @teams.select(:id)
-          @subteams = Subteam.where(team_id: team_ids).order(:name)
+          @subteams = Subteam.where(team_id: team_ids).active.or(Subteam.where(id: @task.subteam_id)).order(:name)
           @assignees = User.member.where(team_id: team_ids).order(:name)
      end
 end

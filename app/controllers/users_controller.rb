@@ -29,6 +29,6 @@ class UsersController < ApplicationController
      end
 
      def user_params
-          params.require(:user).permit(:role, :team_id)
+          params.require(:user).permit(:role, :team_id, :subteam_id)
      end
 end

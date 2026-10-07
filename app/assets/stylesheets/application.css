@@ -205,3 +205,12 @@ thead th { color: var(--muted); font-size: .78rem; letter-spacing: .06em; text-t
 .bar-estimate { background: #e9e1d3; color: var(--ink); }
 .bar-actual { background: var(--maroon); color: white; }
 @media (max-width: 640px) { .bar-row { grid-template-columns: 1fr; gap: .3rem; } }
+
+/* Organization screen */
+.org-project { margin-bottom: 1.5rem; }
+.org-teams { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1rem; }
+.org-team { padding: 1rem 1.1rem; border: 1px solid var(--line); border-radius: 12px; background: var(--cream); }
+.org-team .section-heading { margin-bottom: .25rem; }
+.org-team h3 { margin: 0; }
+.plain-list li.org-subteam { flex-direction: row; justify-content: space-between; align-items: center; gap: 1rem; }
+.add-link { display: inline-block; margin-top: .8rem; font-weight: 700; }

@@ -26,7 +26,7 @@
             <th scope="row"><%= user.name %></th>
             <td><%= user.email %></td>
             <td><%= user.role_label %></td>
-            <td><%= user.team&.name || "All teams" %></td>
+            <td><%= user.team&.name || "All teams" %><%= " · #{user.subteam.name}" if user.subteam %></td>
             <td><%= link_to "Change role", edit_user_path(user), aria: { label: "Change role for #{user.name}" } %></td>
           </tr>
         <% end %>

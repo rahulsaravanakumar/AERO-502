@@ -1,5 +1,6 @@
 class User < ApplicationRecord
      belongs_to :team, optional: true
+     belongs_to :subteam, optional: true
      has_secure_password
 
      has_many :task_assignments, dependent: :destroy
@@ -20,6 +21,7 @@ class User < ApplicationRecord
      validates :email, presence: true, uniqueness: { case_sensitive: false },
                        format: { with: URI::MailTo::EMAIL_REGEXP }
      validates :team, presence: true, unless: :chief_engineer?
+     validate :subteam_belongs_to_team
 
      def role_label
           ROLE_LABELS.fetch(role)
@@ -42,6 +44,12 @@ class User < ApplicationRecord
      end
 
      private
+
+     def subteam_belongs_to_team
+          return if subteam.blank? || subteam.team_id == team_id
+
+          errors.add(:subteam, "must belong to the person's team")
+     end
 
      def normalize_email
           self.email = email.to_s.strip.downcase

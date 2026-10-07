@@ -23,8 +23,13 @@
     </div>
     <div class="field">
       <%= form.label :team_id, "Team" %>
-      <%= form.collection_select :team_id, Team.order(:name), :id, :name, { include_blank: "No team (Chief Engineer only)" }, **field_error_attributes(@user, :team) %>
+      <%= form.collection_select :team_id, Team.active.or(Team.where(id: @user.team_id)).order(:name), :id, :name, { include_blank: "No team (Chief Engineer only)" }, **field_error_attributes(@user, :team) %>
       <%= field_error(@user, :team) %>
+    </div>
+    <div class="field">
+      <%= form.label :subteam_id, "Subteam" %>
+      <%= form.grouped_collection_select :subteam_id, Team.active.order(:name), :active_subteams, :name, :id, :name, { include_blank: "No subteam" }, **field_error_attributes(@user, :subteam) %>
+      <%= field_error(@user, :subteam) %>
     </div>
   </div>
 

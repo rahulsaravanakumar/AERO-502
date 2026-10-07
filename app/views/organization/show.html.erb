@@ -1,0 +1,79 @@
+<% content_for :title, "Organization · AERO Task Hub" %>
+
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">ADMINISTRATION</p>
+    <h1>Teams and subteams</h1>
+    <p class="lede">Classes (teams) and their subteams organize every task. Archived groups leave everyday lists but keep their tasks and hours.</p>
+  </div>
+  <% if current_user.chief_engineer? %>
+    <div class="form-actions">
+      <%= link_to "New project", new_project_path, class: "button button-secondary" %>
+      <%= link_to "New team", new_team_path, class: "button" %>
+    </div>
+  <% end %>
+</div>
+
+<% @projects.each do |project| %>
+  <section class="panel org-project" data-project="<%= project.id %>">
+    <div class="section-heading">
+      <h2><%= project.name %> <span class="muted">project</span></h2>
+      <% if current_user.chief_engineer? %>
+        <div class="row-actions">
+          <%= link_to "Rename", edit_project_path(project), aria: { label: "Rename project #{project.name}" } %>
+          <%= button_to "Archive", archive_project_path(project), method: :patch, class: "link-button", aria: { label: "Archive project #{project.name}" } %>
+        </div>
+      <% end %>
+    </div>
+
+    <% teams = @teams.where(project: project).order(:name) %>
+    <% if teams.any? %>
+      <div class="org-teams">
+        <% teams.each do |team| %>
+          <article class="org-team" data-team="<%= team.id %>">
+            <div class="section-heading">
+              <h3><%= team.name %></h3>
+              <% if current_user.chief_engineer? %>
+                <div class="row-actions">
+                  <%= link_to "Rename", edit_team_path(team), aria: { label: "Rename team #{team.name}" } %>
+                  <%= button_to "Archive", archive_team_path(team), method: :patch, class: "link-button", aria: { label: "Archive team #{team.name}" } %>
+                </div>
+              <% end %>
+            </div>
+            <ul class="plain-list">
+              <% team.subteams.active.order(:name).each do |subteam| %>
+                <li class="org-subteam">
+                  <span><%= subteam.name %></span>
+                  <div class="row-actions">
+                    <%= link_to "Rename", edit_subteam_path(subteam), aria: { label: "Rename subteam #{subteam.name}" } %>
+                    <%= button_to "Archive", archive_subteam_path(subteam), method: :patch, class: "link-button", aria: { label: "Archive subteam #{subteam.name}" } %>
+                  </div>
+                </li>
+              <% end %>
+            </ul>
+            <%= link_to "Add subteam", new_subteam_path(team_id: team.id), class: "add-link" %>
+          </article>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="muted">No teams in this project yet.</p>
+    <% end %>
+  </section>
+<% end %>
+
+<section class="panel" data-archived>
+  <h2>Archived</h2>
+  <% if @archived.any? %>
+    <ul class="plain-list">
+      <% @archived.each do |record| %>
+        <li class="org-subteam">
+          <span><%= record.name %> <span class="muted"><%= record.model_name.human.downcase %></span></span>
+          <%= button_to "Restore", [ :restore, record ], method: :patch, class: "link-button", form_class: "row-actions",
+                                                          aria: { label: "Restore #{record.model_name.human.downcase} #{record.name}" } %>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="muted">Nothing is archived.</p>
+  <% end %>
+</section>

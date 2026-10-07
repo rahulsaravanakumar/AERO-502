@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_07_130000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_07_140000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -18,6 +18,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_130000) do
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "archived_at"
     t.index ["name"], name: "index_projects_on_name", unique: true
   end
 
@@ -26,6 +27,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_130000) do
     t.bigint "team_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "archived_at"
     t.index ["team_id", "name"], name: "index_subteams_on_team_id_and_name", unique: true
     t.index ["team_id"], name: "index_subteams_on_team_id"
   end
@@ -86,6 +88,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_130000) do
     t.bigint "project_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "archived_at"
     t.index ["project_id", "name"], name: "index_teams_on_project_id_and_name", unique: true
     t.index ["project_id"], name: "index_teams_on_project_id"
   end
@@ -110,7 +113,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_130000) do
     t.bigint "team_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "subteam_id"
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["subteam_id"], name: "index_users_on_subteam_id"
     t.index ["team_id"], name: "index_users_on_team_id"
   end
 
@@ -127,5 +132,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_130000) do
   add_foreign_key "teams", "projects"
   add_foreign_key "time_entries", "tasks"
   add_foreign_key "time_entries", "users"
+  add_foreign_key "users", "subteams"
   add_foreign_key "users", "teams"
 end

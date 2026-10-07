@@ -3,7 +3,7 @@ class DashboardController < ApplicationController
      before_action :ensure_leader
 
      def index
-          @projects = Project.order(:name)
+          @projects = Project.active.order(:name)
           project = Project.find_by(id: params[:project_id]) || default_project
           @summary = DashboardSummary.new(user: current_user, project: project, from: params[:from], to: params[:to])
      end

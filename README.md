@@ -22,7 +22,7 @@ bin/rails db:seed
 bin/rails server
 ```
 
-Open http://localhost:3000. The practice password defaults to `AeroSprint1!` and can be overridden with `DEMO_PASSWORD`. Practice emails are printed by the seed script and documented in `docs/USER_GUIDE.md`.
+Open http://localhost:3000. The practice password defaults to `AeroSprint1!` and can be overridden with `DEMO_PASSWORD`. Practice emails are listed in `docs/TRAINING_GUIDE.md`.
 
 ## Verification
 

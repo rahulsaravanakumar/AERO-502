@@ -218,3 +218,10 @@ thead th { color: var(--muted); font-size: .78rem; letter-spacing: .06em; text-t
 .org-row, .plain-list li.org-row { display: flex; flex-direction: row; justify-content: space-between; align-items: center; gap: 1rem; }
 .org-projects li { padding: .45rem 0 .45rem .9rem; }
 .add-link { display: inline-block; margin-top: .6rem; font-weight: 700; }
+
+/* In-app user guide */
+.guide { max-width: 60rem; }
+.guide h1 { margin-top: 0; }
+.guide h2 { margin-top: 2rem; }
+.guide table { width: 100%; margin: 1rem 0; }
+.guide td, .guide th { vertical-align: top; }

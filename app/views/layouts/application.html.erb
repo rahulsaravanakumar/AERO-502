@@ -20,6 +20,7 @@
 
       <% if signed_in? %>
         <nav aria-label="Primary navigation">
+          <%= link_to "Help", help_path %>
           <% if current_user.leader? %>
             <%= link_to "Dashboard", dashboard_path %>
           <% end %>

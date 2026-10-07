@@ -8,6 +8,7 @@ Rails.application.routes.draw do
      delete "logout", to: "sessions#destroy"
      get "auth/:provider/callback", to: "sessions#omniauth", as: :omniauth_callback
      get "auth/failure", to: "sessions#failure"
+     get "help", to: "help#show"
 
      resources :users, only: %i[index new create edit update] do
           member do

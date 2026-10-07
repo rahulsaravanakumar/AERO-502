@@ -12,7 +12,7 @@
     <%= button_to "/auth/google_oauth2", method: :post, class: "button button-wide google-button", data: { turbo: false } do %>
       Sign in with Google
     <% end %>
-    <p class="muted">Use the Google (TAMU) email the Chief Engineer added for you.</p>
+    <p class="muted">Use the Google (TAMU) email the Chief Engineer added for you. Trouble signing in? Read the <%= link_to "user guide", help_path %>.</p>
 
     <% if Rails.configuration.x.password_sign_in %>
       <p class="divider"><span>or use a practice account</span></p>

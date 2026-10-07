@@ -23,6 +23,9 @@ module Aero502
     config.load_defaults 8.0
     config.generators.test_framework :rspec
 
+    # SAE AERO works in College Station, so "today" and timestamps use US Central time.
+    config.time_zone = "Central Time (US & Canada)"
+
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.

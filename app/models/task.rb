@@ -48,6 +48,14 @@ class Task < ApplicationRecord
           @reference_urls = text.to_s.split(/\r?\n/).map(&:strip).compact_blank
      end
 
+     # Replaces the assignees and records who was assigned or removed, and by whom.
+     def assign_members(user_ids, actor:)
+          previous_ids = assignee_ids
+          self.assignee_ids = user_ids
+          (user_ids.map(&:to_i) - previous_ids).each { |id| record_assignment("assigned", id, actor) }
+          (previous_ids - user_ids.map(&:to_i)).each { |id| record_assignment("unassigned", id, actor) }
+     end
+
      def total_actual_hours
           return time_entries.sum(&:hours) if time_entries.loaded?
 
@@ -95,6 +103,10 @@ class Task < ApplicationRecord
           from_status, to_status = saved_change_to_status
           TaskEvent.create!(task: self, actor: acting_user, action: "status_changed",
                             from_status: from_status, to_status: to_status)
+     end
+
+     def record_assignment(action, user_id, actor)
+          TaskEvent.create!(task: self, actor: actor, action: action, subject_user_id: user_id)
      end
 
      def replace_links

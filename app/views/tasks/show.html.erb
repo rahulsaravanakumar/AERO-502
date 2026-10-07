@@ -75,6 +75,25 @@
   </aside>
 </div>
 
+<% if current_user.can_manage?(@task) %>
+  <section class="panel" data-history>
+    <h2>History</h2>
+    <% events = @task.events.includes(:actor, :subject_user).order(created_at: :desc, id: :desc) %>
+    <% if events.any? %>
+      <ol class="plain-list history-list">
+        <% events.each do |event| %>
+          <li>
+            <time datetime="<%= event.created_at.iso8601 %>"><%= event.created_at.to_fs(:long) %></time>
+            <span><strong><%= event.actor_name %></strong> <%= event.description %></span>
+          </li>
+        <% end %>
+      </ol>
+    <% else %>
+      <p class="muted">No changes have been recorded yet.</p>
+    <% end %>
+  </section>
+<% end %>
+
 <section class="panel">
   <h2>Hours by member</h2>
   <% if @task.time_entries.any? %>

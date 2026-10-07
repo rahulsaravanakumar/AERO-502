@@ -116,7 +116,7 @@ RSpec.describe "Delivered task card stories", type: :request do
           expect(task.reload.assignee_ids).to eq([ second_member.id ])
           expect(task.task_assignments.count).to eq(1)
           get task_path(task)
-          expect(response.body).to include("Taylor Member")
-          expect(response.body).not_to include("Morgan Member")
+          assigned = response.parsed_body.css(".detail-list div").find { |row| row.at_css("dt").text == "Assigned members" }
+          expect(assigned.at_css("dd").text).to eq("Taylor Member")
      end
 end

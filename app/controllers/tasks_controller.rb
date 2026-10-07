@@ -111,11 +111,14 @@ class TasksController < ApplicationController
           @task.team = current_user.team if current_user.officer?
      end
 
+     # Assignees change only when the form submits them (it always sends the field).
      def save_task_with_assignments
-          assignee_ids = Array(task_params[:assignee_ids]).reject(&:blank?).uniq
           Task.transaction do
                @task.save!
-               @task.assignee_ids = assignee_ids
+               if task_params.key?(:assignee_ids)
+                    assignee_ids = Array(task_params[:assignee_ids]).reject(&:blank?).uniq
+                    @task.assign_members(assignee_ids, actor: current_user)
+               end
           end
           true
      rescue ActiveRecord::RecordInvalid => error

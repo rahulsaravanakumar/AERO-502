@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_07_140000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_07_150000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -49,7 +49,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_140000) do
     t.string "from_status"
     t.string "to_status"
     t.datetime "created_at", null: false
+    t.bigint "subject_user_id"
     t.index ["actor_id"], name: "index_task_events_on_actor_id"
+    t.index ["subject_user_id"], name: "index_task_events_on_subject_user_id"
     t.index ["task_id", "created_at"], name: "index_task_events_on_task_id_and_created_at"
     t.index ["task_id"], name: "index_task_events_on_task_id"
   end
@@ -124,6 +126,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_140000) do
   add_foreign_key "task_assignments", "users"
   add_foreign_key "task_events", "tasks"
   add_foreign_key "task_events", "users", column: "actor_id"
+  add_foreign_key "task_events", "users", column: "subject_user_id"
   add_foreign_key "task_links", "tasks"
   add_foreign_key "tasks", "projects"
   add_foreign_key "tasks", "subteams"

@@ -15,8 +15,6 @@ RSpec.describe "Delivered task card stories", type: :request do
                due_date: "2026-10-12",
                estimated_hours: "6.25",
                project_id: projects(:aero).id,
-               team_id: teams(:aerodynamics).id,
-               subteam_id: subteams(:wing).id,
                assignee_ids: [ users(:member).id ]
           }.merge(overrides)
      end
@@ -63,8 +61,6 @@ RSpec.describe "Delivered task card stories", type: :request do
           expect(form.at_css('input[name="task[estimated_hours]"]')["value"]).to eq("6.25")
           expect(form.at_css('select[name="task[status]"] option[selected]')["value"]).to eq("backlog")
           expect(form.at_css('select[name="task[project_id]"] option[selected]')["value"]).to eq(projects(:aero).id.to_s)
-          expect(form.at_css('select[name="task[team_id]"] option[selected]')["value"]).to eq(teams(:aerodynamics).id.to_s)
-          expect(form.at_css('select[name="task[subteam_id]"] option[selected]')["value"]).to eq(subteams(:wing).id.to_s)
      end
 
      it "saves an edited estimate and rejects negative and nonnumeric estimates" do

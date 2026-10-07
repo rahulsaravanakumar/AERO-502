@@ -19,7 +19,7 @@ spar_check:
   due_date: 2026-10-01
   estimated_hours: 4
   status: 1
-  project: aero
+  project: airframe_build
   team: structures
   subteam: airframe
   creator: other_officer

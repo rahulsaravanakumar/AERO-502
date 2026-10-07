@@ -12,7 +12,7 @@
 <%= form_with url: dashboard_path, method: :get, class: "panel filter-bar", aria: { label: "Dashboard filters" } do |form| %>
   <div class="field">
     <%= form.label :project_id, "Project" %>
-    <%= form.collection_select :project_id, @projects, :id, :name, selected: @summary.project&.id %>
+    <%= form.collection_select :project_id, @projects, :id, :full_name, include_blank: "All projects", selected: @summary.project&.id %>
   </div>
   <div class="field">
     <%= form.label :from, "Hours from" %>

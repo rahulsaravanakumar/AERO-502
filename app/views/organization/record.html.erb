@@ -1,0 +1,55 @@
+<% content_for :title, "#{@record.name} · AERO Task Hub" %>
+
+<div class="page-heading">
+  <div>
+    <p class="eyebrow"><%= record_label.upcase %></p>
+    <h1><%= @record.name %></h1>
+    <% unless @record.is_a?(Team) %>
+      <p class="lede" data-parents><%= @record.is_a?(Project) ? @record.subteam.full_name : @record.team.name %></p>
+    <% end %>
+  </div>
+  <%= link_to "Back to teams", organization_path, class: "button button-secondary" %>
+</div>
+
+<% if @record.archived? %>
+  <div class="flash flash-alert" role="status" data-archived-notice>
+    This <%= record_label.downcase %> was archived on <%= @record.archived_at.to_date.to_fs(:long) %>. Its tasks and hours are kept below.
+  </div>
+<% end %>
+
+<section class="panel" data-record-tasks>
+  <h2>Tasks and hours</h2>
+  <% if @tasks.any? %>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Task</th>
+            <th scope="col">Project</th>
+            <th scope="col">Status</th>
+            <th scope="col">Estimated</th>
+            <th scope="col">Actual</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @tasks.each do |task| %>
+            <tr>
+              <th scope="row"><%= link_to task.title, task %></th>
+              <td><%= task.project.full_name %></td>
+              <td><%= task.status.humanize %></td>
+              <td><%= estimate_label(task.estimated_hours) %></td>
+              <td><%= estimate_label(task.total_actual_hours) %></td>
+            </tr>
+          <% end %>
+          <tr class="total-row">
+            <th scope="row" colspan="3">Total</th>
+            <td><%= estimate_label(@tasks.sum(&:estimated_hours)) %></td>
+            <td><%= estimate_label(@tasks.sum(&:total_actual_hours)) %></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <p class="muted">No tasks are recorded here.</p>
+  <% end %>
+</section>

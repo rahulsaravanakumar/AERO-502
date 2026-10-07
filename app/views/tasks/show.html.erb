@@ -2,7 +2,7 @@
 
 <div class="page-heading">
   <div>
-    <p class="eyebrow"><%= @task.project.name %> · <%= @task.team.name %></p>
+    <p class="eyebrow"><%= @task.project.full_name %></p>
     <h1><%= @task.title %></h1>
     <span class="badge status-<%= @task.status %>"><%= @task.status.to_s.humanize %></span>
   </div>

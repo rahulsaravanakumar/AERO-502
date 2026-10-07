@@ -5,13 +5,14 @@ class OrganizationController < ApplicationController
      def show
           if current_user.chief_engineer?
                @teams = Team.active
-               @projects = Project.active
-               @archived = Project.archived.to_a + Team.archived.to_a + Subteam.archived.to_a
+               @archived = Team.archived.to_a + Subteam.archived.includes(:team).to_a +
+                           Project.archived.includes(subteam: :team).to_a
           else
                @teams = Team.active.where(id: current_user.team_id)
-               @projects = Project.active.where(id: @teams.select(:project_id))
-               @archived = Subteam.archived.where(team_id: current_user.team_id).to_a
+               own_subteams = Subteam.where(team_id: current_user.team_id)
+               @archived = own_subteams.archived.includes(:team).to_a +
+                           Project.archived.where(subteam: own_subteams).includes(subteam: :team).to_a
           end
-          @projects = @projects.order(:name)
+          @teams = @teams.includes(subteams: :projects).order(:name)
      end
 end

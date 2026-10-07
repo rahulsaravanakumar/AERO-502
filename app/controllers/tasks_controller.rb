@@ -104,13 +104,13 @@ class TasksController < ApplicationController
      def task_params
           params.require(:task).permit(
                :title, :description, :instructions, :reference_links_text, :start_date, :due_date,
-               :estimated_hours, :status, :project_id, :team_id, :subteam_id,
+               :estimated_hours, :status, :project_id,
                assignee_ids: []
           )
      end
 
      def restrict_task_to_officer_team
-          @task.team = current_user.team if current_user.officer?
+          @task.allowed_team_id = current_user.team_id if current_user.officer?
      end
 
      # Assignees change only when the form submits them (it always sends the field).
@@ -130,11 +130,11 @@ class TasksController < ApplicationController
 
      # Everyday lists show active groups, plus the task's current ones when editing.
      def prepare_form
-          @projects = Project.active.or(Project.where(id: @task.project_id)).order(:name)
-          teams = current_user.chief_engineer? ? Team.all : Team.where(id: current_user.team_id)
-          @teams = teams.active.or(teams.where(id: @task.team_id)).order(:name)
-          team_ids = @teams.select(:id)
-          @subteams = Subteam.where(team_id: team_ids).active.or(Subteam.where(id: @task.subteam_id)).order(:name)
+          team_ids = current_user.chief_engineer? ? Team.select(:id) : [ current_user.team_id ]
+          active = Project.active.joins(subteam: :team).merge(Subteam.active).merge(Team.active)
+                          .where(subteams: { team_id: team_ids })
+          current = Project.where(id: @task.project_id)
+          @projects = (active.includes(subteam: :team).to_a | current.includes(subteam: :team).to_a).sort_by(&:full_name)
           @assignees = User.member.where(team_id: team_ids).order(:name)
      end
 end

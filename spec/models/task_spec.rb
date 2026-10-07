@@ -1,11 +1,12 @@
 require "rails_helper"
 
 RSpec.describe Task, type: :model do
-     it "rejects subteams from another team" do
+     it "takes its subteam and team from its project, whatever else was set" do
           task = tasks(:wing_test)
-          task.subteam = subteams(:airframe)
-          expect(task).not_to be_valid
-          expect(task.errors[:subteam]).to include("must belong to the selected team")
+          task.assign_attributes(subteam: subteams(:airframe), team: teams(:structures))
+
+          expect(task).to be_valid
+          expect([ task.subteam, task.team ]).to eq([ subteams(:wing), teams(:aerodynamics) ])
      end
 
      it "calculates member hours consistently with preloaded entries" do

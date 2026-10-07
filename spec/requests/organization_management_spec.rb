@@ -1,123 +1,166 @@
 require "rails_helper"
 
-# KAN-19: leaders manage projects, teams and subteams.
+# KAN-19 / scope S01 / UAT B1: teams contain subteams, subteams contain projects,
+# and tasks belong to projects.
 RSpec.describe "Organization management", type: :request do
-     it "lets the Chief Engineer create a project, a team under it and a subteam, kept after reopening" do
+     def create_team(name)
+          post teams_path, params: { team: { name: name } }
+          Team.find_by!(name: name)
+     end
+
+     def create_subteam(name, team)
+          post subteams_path, params: { subteam: { name: name, team_id: team.id } }
+          team.subteams.find_by!(name: name)
+     end
+
+     def create_project(name, subteam)
+          post projects_path, params: { project: { name: name, subteam_id: subteam.id } }
+          subteam.projects.find_by!(name: name)
+     end
+
+     it "B1.1/B1.2: builds Team > Subteam > Project and shows the saved parents when reopened" do
           sign_in(users(:chief))
 
-          post projects_path, params: { project: { name: "SAE AERO 2027" } }
-          project = Project.find_by!(name: "SAE AERO 2027")
-          post teams_path, params: { team: { name: "Regular Class", project_id: project.id } }
-          team = Team.find_by!(name: "Regular Class")
-          post subteams_path, params: { subteam: { name: "Aerodynamics", team_id: team.id } }
+          team_a = create_team("Team A")
+          project_a = create_project("Wing ribs", create_subteam("Wings", team_a))
+          team_b = create_team("Team B")
+          project_b = create_project("Landing gear", create_subteam("Gear", team_b))
           expect(response).to redirect_to(organization_path)
 
-          get organization_path
-          tree = response.parsed_body.at_css("[data-project='#{project.id}']").text.squish
-          expect(tree).to include("SAE AERO 2027", "Regular Class", "Aerodynamics")
-          expect(team.reload.project).to eq(project)
-          expect(team.subteams.map(&:name)).to eq([ "Aerodynamics" ])
+          get project_path(project_a)
+          expect(response.parsed_body.at_css("[data-parents]").text.squish).to eq("Team A · Wings")
 
-          get new_task_path
-          options = response.parsed_body.css("#task_team_id option, #task_subteam_id option").map(&:text)
-          expect(options).to include("Regular Class", "Aerodynamics")
+          get organization_path
+          team_b_card = response.parsed_body.at_css("[data-team='#{team_b.id}']").text
+          expect(team_b_card).to include("Gear", "Landing gear")
+          expect(team_b_card).not_to include("Wing ribs")
+          expect(project_b.reload.team).to eq(team_b)
      end
 
-     it "refuses to save a missing name or parent and identifies the missing field" do
+     it "B1.3: lets an officer add a second project to their subteam without duplicating it" do
+          sign_in(users(:officer))
+
+          expect { create_project("Tail section", subteams(:wing)) }.not_to change(Subteam, :count)
+          expect(subteams(:wing).projects.map(&:name)).to contain_exactly("SAE AERO Design", "Archive Project", "Tail section")
+     end
+
+     it "B1.4/B1.8: refuses a missing name or parent, identifies the field and creates nothing" do
           sign_in(users(:chief))
 
-          expect { post teams_path, params: { team: { name: "", project_id: "" } } }.not_to change(Team, :count)
+          expect { post teams_path, params: { team: { name: "" } } }.not_to change(Team, :count)
           expect(response).to have_http_status(:unprocessable_content)
-          page = response.parsed_body
-          expect(page.at_css("#team_name_error").text).to include("Name can't be blank")
-          expect(page.at_css("#team_project_error").text).to include("Project must exist")
+          expect(response.parsed_body.at_css("#team_name_error").text).to include("Name can't be blank")
 
-          expect { post subteams_path, params: { subteam: { name: "Wings" } } }.not_to change(Subteam, :count)
+          expect { post subteams_path, params: { subteam: { name: "Wings", team_id: "" } } }.not_to change(Subteam, :count)
           expect(response.parsed_body.at_css("#subteam_team_error").text).to include("Team must exist")
 
-          expect { post projects_path, params: { project: { name: "" } } }.not_to change(Project, :count)
-          expect(response.parsed_body.at_css("#project_name_error").text).to include("Name can't be blank")
+          expect { post projects_path, params: { project: { name: "Ribs", subteam_id: "" } } }.not_to change(Project, :count)
+          expect(response.parsed_body.at_css("#project_subteam_error").text).to include("Subteam must exist")
      end
 
-     it "lets the Chief Engineer rename and archive records, which leave everyday lists but keep their tasks" do
+     it "B1.5/B1.8: keeps a new subteam under its team after refreshing and offers its projects in the task form" do
+          sign_in(users(:chief))
+          subteam = create_subteam("Propulsion", teams(:aerodynamics))
+          create_project("Motor test", subteam)
+
+          get organization_path
+          card = response.parsed_body.at_css("[data-team='#{teams(:aerodynamics).id}']").text
+          expect(card).to include("Propulsion", "Motor test")
+
+          get new_task_path
+          expect(response.parsed_body.css("#task_project_id option").map(&:text))
+               .to include("Aerodynamics · Propulsion · Motor test")
+     end
+
+     it "B1.7: renames and archives records; archived ones leave everyday lists but their tasks and hours stay viewable" do
           sign_in(users(:chief))
 
           patch team_path(teams(:structures)), params: { team: { name: "Micro Class" } }
-          expect(teams(:structures).reload.name).to eq("Micro Class")
-          patch subteam_path(subteams(:airframe)), params: { subteam: { name: "Structures" } }
-          patch project_path(projects(:archive)), params: { project: { name: "Old project" } }
-          expect(projects(:archive).reload.name).to eq("Old project")
+          patch subteam_path(subteams(:airframe)), params: { subteam: { name: "Fuselage" } }
+          patch project_path(projects(:airframe_build)), params: { project: { name: "Spar build" } }
+          expect([ teams(:structures), subteams(:airframe), projects(:airframe_build) ].map { |record| record.reload.name })
+               .to eq([ "Micro Class", "Fuselage", "Spar build" ])
 
+          patch archive_project_path(projects(:airframe_build))
+          patch archive_subteam_path(subteams(:airframe))
           patch archive_team_path(teams(:structures))
-          patch archive_subteam_path(subteams(:wing))
-          patch archive_project_path(projects(:archive))
-          expect(teams(:structures).reload).to be_archived
 
           get new_task_path
-          options = response.parsed_body.css("select option").map(&:text)
-          expect(options).not_to include("Micro Class", "Wing Analysis", "Old project")
+          options = response.parsed_body.css("select option").map(&:text).join(" ")
+          expect(options).not_to include("Micro Class", "Fuselage", "Spar build")
 
           get organization_path
-          archived = response.parsed_body.at_css("[data-archived]").text
-          expect(archived).to include("Micro Class", "Wing Analysis", "Old project")
+          archived = response.parsed_body.at_css("[data-archived]")
+          expect(archived.text).to include("Micro Class", "Fuselage", "Spar build")
+          expect(archived.at_css("a[href='#{project_path(projects(:airframe_build))}']")).to be_present
 
-          get task_path(tasks(:spar_check))
-          expect(response).to have_http_status(:ok)
-          expect(response.body).to include("Verify spar dimensions", "1.5 hours")
+          get project_path(projects(:airframe_build))
+          record = response.parsed_body
+          expect(record.at_css("[data-archived-notice]")).to be_present
+          expect(record.at_css("[data-record-tasks]").text).to include("Verify spar dimensions", "1.5 hours")
 
           patch restore_team_path(teams(:structures))
           expect(teams(:structures).reload).not_to be_archived
      end
 
-     it "lets an officer manage only their own team's subteams, including direct requests" do
+     it "B1.9: lets a Team A officer manage only Team A subteams and projects, including direct requests" do
           sign_in(users(:officer))
-          get new_subteam_path
-          expect(response.parsed_body.css("#subteam_team_id option").map(&:text)).to eq([ "Select a team", "Aerodynamics" ])
-          get new_team_path
+
+          create_subteam("Wind Tunnel", teams(:aerodynamics))
+          patch subteam_path(subteams(:wing)), params: { subteam: { name: "Wing Design" } }
+          patch project_path(projects(:aero)), params: { project: { name: "Wing build" } }
+          expect([ subteams(:wing).reload.name, projects(:aero).reload.name ]).to eq([ "Wing Design", "Wing build" ])
+
+          expect { post subteams_path, params: { subteam: { name: "Sneaky", team_id: teams(:structures).id } } }
+               .not_to change(Subteam, :count)
+          expect { post projects_path, params: { project: { name: "Sneaky", subteam_id: subteams(:airframe).id } } }
+               .not_to change(Project, :count)
+          patch subteam_path(subteams(:airframe)), params: { subteam: { name: "Hijacked" } }
+          patch archive_project_path(projects(:airframe_build))
+          expect(subteams(:airframe).reload.name).to eq("Airframe")
+          expect(projects(:airframe_build).reload).not_to be_archived
           expect(response).to redirect_to(organization_path)
 
-          post subteams_path, params: { subteam: { name: "Wind Tunnel", team_id: teams(:aerodynamics).id } }
-          expect(Subteam.find_by(name: "Wind Tunnel").team).to eq(teams(:aerodynamics))
-          patch subteam_path(subteams(:wing)), params: { subteam: { name: "Wing Design" } }
-          expect(subteams(:wing).reload.name).to eq("Wing Design")
-          patch archive_subteam_path(subteams(:wing))
-          expect(subteams(:wing).reload).to be_archived
-
-          expect do
-               post subteams_path, params: { subteam: { name: "Sneaky", team_id: teams(:structures).id } }
-          end.not_to change(Subteam, :count)
-          patch subteam_path(subteams(:airframe)), params: { subteam: { name: "Hijacked" } }
-          patch subteam_path(subteams(:wing)), params: { subteam: { team_id: teams(:structures).id } }
-          patch archive_subteam_path(subteams(:airframe))
-          expect(subteams(:airframe).reload).to have_attributes(name: "Airframe", archived_at: nil)
-          expect(subteams(:wing).reload.team).to eq(teams(:aerodynamics))
-
-          expect { post teams_path, params: { team: { name: "New", project_id: projects(:aero).id } } }
-               .not_to change(Team, :count)
-          patch archive_project_path(projects(:aero))
-          expect(projects(:aero).reload).not_to be_archived
+          expect { post teams_path, params: { team: { name: "New team" } } }.not_to change(Team, :count)
+          get new_team_path
+          expect(response).to redirect_to(organization_path)
+          get project_path(projects(:airframe_build))
           expect(response).to redirect_to(organization_path)
      end
 
-     it "shows officers only their own team's structure and members no organization screen" do
+     it "keeps a record's parent fixed after creation so its tasks stay consistent" do
+          sign_in(users(:chief))
+          patch project_path(projects(:aero)), params: { project: { subteam_id: subteams(:airframe).id } }
+          patch subteam_path(subteams(:wing)), params: { subteam: { team_id: teams(:structures).id } }
+
+          expect(projects(:aero).reload.subteam).to eq(subteams(:wing))
+          expect(subteams(:wing).reload.team).to eq(teams(:aerodynamics))
+     end
+
+     it "shows officers only their own team, offers only their subteams as parents, and gives members nothing" do
           sign_in(users(:officer))
           get organization_path
           expect(response.body).to include("Aerodynamics", "Wing Analysis")
           expect(response.body).not_to include("Airframe")
+          get new_project_path
+          expect(response.parsed_body.css("#project_subteam_id option").map(&:text))
+               .to eq([ "Select a subteam", "Aerodynamics · Wing Analysis" ])
+          get new_subteam_path
+          expect(response.parsed_body.css("#subteam_team_id option").map(&:text)).to eq([ "Select a team", "Aerodynamics" ])
 
           sign_in(users(:member))
-          get organization_path
-          expect(response).to redirect_to(root_path)
-          get new_subteam_path
-          expect(response).to redirect_to(root_path)
+          [ organization_path, new_subteam_path, project_path(projects(:aero)) ].each do |path|
+               get path
+               expect(response).to redirect_to(root_path)
+          end
      end
 
-     it "opens the create and rename forms for each kind of record" do
+     it "opens the create, rename and record pages for each kind of record" do
           sign_in(users(:chief))
 
-          [ new_project_path, new_team_path, new_subteam_path(team_id: teams(:aerodynamics).id),
-            edit_project_path(projects(:aero)), edit_team_path(teams(:aerodynamics)),
-            edit_subteam_path(subteams(:wing)) ].each do |path|
+          [ new_team_path, new_subteam_path(team_id: teams(:aerodynamics).id), new_project_path(subteam_id: subteams(:wing).id),
+            edit_team_path(teams(:aerodynamics)), edit_subteam_path(subteams(:wing)), edit_project_path(projects(:aero)),
+            team_path(teams(:aerodynamics)), subteam_path(subteams(:wing)), project_path(projects(:aero)) ].each do |path|
                get path
                expect(response).to have_http_status(:ok)
           end
@@ -136,15 +179,18 @@ RSpec.describe "Organization management", type: :request do
           expect(response.body).to include("Subteam must belong to the person&#39;s team")
      end
 
-     it "seeds the SAE AERO classes and subteams" do
+     it "seeds the SAE AERO classes, their subteams and starter projects" do
           expect { load Rails.root.join("db/seeds.rb") }.to output(/Seeded SAE AERO practice data/).to_stdout
 
-          project = Project.find_by!(name: "SAE AERO")
-          structure = project.teams.includes(:subteams).to_h { |team| [ team.name, team.subteams.map(&:name).sort ] }
+          structure = %w[Regular Micro Advanced].to_h do |name|
+               team = Team.find_by!(name: "#{name} Class")
+               [ team.name, team.subteams.order(:name).map(&:name) ]
+          end
           expect(structure).to eq(
                "Regular Class" => [ "Aerodynamics", "Structures" ],
                "Micro Class" => [ "Aerodynamics", "Structures" ],
                "Advanced Class" => [ "Aerodynamics", "Autonomous Systems", "Structures" ]
           )
+          expect(Task.find_by!(title: "Wing load test").project.subteam.name).to eq("Aerodynamics")
      end
 end

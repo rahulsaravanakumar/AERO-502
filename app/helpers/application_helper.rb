@@ -2,7 +2,7 @@ module ApplicationHelper
      # Active subteams labelled with their team, since names repeat across teams.
      def subteam_options(selected)
           subteams = Subteam.active.joins(:team).merge(Team.active).includes(:team).order("teams.name", :name)
-          options_for_select(subteams.map { |subteam| [ "#{subteam.team.name} · #{subteam.name}", subteam.id ] }, selected)
+          options_for_select(subteams.map { |subteam| [ subteam.full_name, subteam.id ] }, selected)
      end
 
      def field_error_id(record, attribute)

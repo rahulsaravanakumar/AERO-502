@@ -210,10 +210,11 @@ thead th { color: var(--muted); font-size: .78rem; letter-spacing: .06em; text-t
 @media (max-width: 640px) { .bar-row { grid-template-columns: 1fr; gap: .3rem; } }
 
 /* Organization screen */
-.org-project { margin-bottom: 1.5rem; }
-.org-teams { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1rem; }
-.org-team { padding: 1rem 1.1rem; border: 1px solid var(--line); border-radius: 12px; background: var(--cream); }
+.org-teams { display: grid; grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
 .org-team .section-heading { margin-bottom: .25rem; }
-.org-team h3 { margin: 0; }
-.plain-list li.org-subteam { flex-direction: row; justify-content: space-between; align-items: center; gap: 1rem; }
-.add-link { display: inline-block; margin-top: .8rem; font-weight: 700; }
+.org-team h2 { margin: 0; font-size: 1.35rem; }
+.org-subteam-block { margin-top: 1rem; padding-top: .75rem; border-top: 1px solid var(--line); }
+.org-subteam-block h3 { margin: 0; font-size: 1.05rem; }
+.org-row, .plain-list li.org-row { display: flex; flex-direction: row; justify-content: space-between; align-items: center; gap: 1rem; }
+.org-projects li { padding: .45rem 0 .45rem .9rem; }
+.add-link { display: inline-block; margin-top: .6rem; font-weight: 700; }

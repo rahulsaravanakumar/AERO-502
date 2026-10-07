@@ -17,7 +17,7 @@ RSpec.describe "Project dashboard", type: :request do
 
      it "shows status counts, each member's assigned tasks and only unfinished overdue tasks" do
           sign_in(users(:chief))
-          get dashboard_path(project_id: projects(:aero).id)
+          get dashboard_path
 
           page = response.parsed_body
           counts = page.css(".metrics [data-status]").to_h { |metric| [ metric["data-status"], metric.at_css("strong").text ] }
@@ -26,6 +26,15 @@ RSpec.describe "Project dashboard", type: :request do
           expect(assignments).to include("Morgan Member Wing load test", "Bailey Member Verify spar dimensions")
           overdue = page.css("[data-overdue] li").map { |item| item.text.squish }
           expect(overdue).to eq([ "Verify spar dimensions Structures · due October 01, 2026 · In progress" ])
+     end
+
+     it "narrows every figure to a selected project" do
+          sign_in(users(:chief))
+          get dashboard_path(project_id: projects(:aero).id)
+
+          expect(response.parsed_body.css("[data-task-overview] tbody th").map(&:text)).to eq([ "Wing load test" ])
+          expect(response.parsed_body.at_css("#project_id option[selected]").text)
+               .to eq("Aerodynamics · Wing Analysis · SAE AERO Design")
      end
 
      it "never lists completed tasks as overdue" do

@@ -1,23 +1,34 @@
-# Practice data matching SAE AERO's structure: one project, three independent
-# classes (teams) and their subteams. Subteam names are confirmed with the
-# customer before production seeding.
-project = Project.find_or_create_by!(name: "SAE AERO")
-
+# Practice data matching SAE AERO's structure (approved scope S01): three
+# independent classes (teams), their subteams, and projects inside subteams.
+# Subteam and project names are confirmed with the customer before
+# production seeding.
 structure = {
-     "Regular Class" => [ "Aerodynamics", "Structures" ],
-     "Micro Class" => [ "Aerodynamics", "Structures" ],
-     "Advanced Class" => [ "Aerodynamics", "Structures", "Autonomous Systems" ]
+     "Regular Class" => {
+          "Aerodynamics" => [ "Wing design" ],
+          "Structures" => [ "Fuselage build" ]
+     },
+     "Micro Class" => {
+          "Aerodynamics" => [ "Airfoil study" ],
+          "Structures" => [ "Spar redesign" ]
+     },
+     "Advanced Class" => {
+          "Aerodynamics" => [ "Control surfaces" ],
+          "Structures" => [ "Payload bay" ],
+          "Autonomous Systems" => [ "Flight controller" ]
+     }
 }
-teams = structure.to_h do |team_name, subteam_names|
-     team = Team.find_or_create_by!(project: project, name: team_name)
-     subteam_names.each { |name| Subteam.find_or_create_by!(team: team, name: name) }
-     [ team_name, team ]
+projects = {}
+structure.each do |team_name, subteams|
+     team = Team.find_or_create_by!(name: team_name)
+     subteams.each do |subteam_name, project_names|
+          subteam = Subteam.find_or_create_by!(team: team, name: subteam_name)
+          project_names.each do |project_name|
+               projects[[ team_name, subteam_name ]] = Project.find_or_create_by!(subteam: subteam, name: project_name)
+          end
+     end
 end
-regular = teams.fetch("Regular Class")
-micro = teams.fetch("Micro Class")
-regular_aero = regular.subteams.find_by!(name: "Aerodynamics")
-regular_structures = regular.subteams.find_by!(name: "Structures")
-micro_structures = micro.subteams.find_by!(name: "Structures")
+regular_wing = projects.fetch([ "Regular Class", "Aerodynamics" ])
+micro_spar = projects.fetch([ "Micro Class", "Structures" ])
 
 password = ENV.fetch("DEMO_PASSWORD", "AeroSprint1!")
 
@@ -27,22 +38,23 @@ def seed_user(email, password, **attributes)
      user
 end
 
+regular = regular_wing.team
+micro = micro_spar.team
 seed_user("chief@example.test", password, name: "Casey Chief", role: :chief_engineer, team: nil, subteam: nil)
 officer_a = seed_user("officer.a@example.test", password, name: "Olivia Officer", role: :officer,
-                      team: regular, subteam: regular_aero)
+                      team: regular, subteam: regular_wing.subteam)
 officer_b = seed_user("officer.b@example.test", password, name: "Owen Officer", role: :officer,
-                      team: micro, subteam: micro_structures)
+                      team: micro, subteam: micro_spar.subteam)
 member_a = seed_user("member.a@example.test", password, name: "Morgan Member", role: :member,
-                     team: regular, subteam: regular_aero)
+                     team: regular, subteam: regular_wing.subteam)
 member_b = seed_user("member.b@example.test", password, name: "Bailey Member", role: :member,
-                     team: regular, subteam: regular_structures)
+                     team: regular, subteam: regular.subteams.find_by!(name: "Structures"))
 member_c = seed_user("member.c@example.test", password, name: "Cameron Member", role: :member,
-                     team: micro, subteam: micro_structures)
+                     team: micro, subteam: micro_spar.subteam)
 
-wing_task = Task.find_or_initialize_by(project: project, title: "Wing load test")
+wing_task = Task.find_or_initialize_by(title: "Wing load test")
 wing_task.update!(
-     team: regular,
-     subteam: regular_aero,
+     project: regular_wing,
      creator: officer_a,
      description: "Complete the load-test worksheet and attach a reviewed summary.",
      instructions: "Use the approved test fixture. Record each run and flag any result outside tolerance.",
@@ -54,16 +66,16 @@ wing_task.update!(
 )
 wing_task.assignee_ids = [ member_a.id, member_b.id ]
 
-backlog_task = Task.find_or_initialize_by(project: project, title: "Review airfoil candidates")
-backlog_task.update!(team: regular, subteam: regular_aero, creator: officer_a,
+backlog_task = Task.find_or_initialize_by(title: "Review airfoil candidates")
+backlog_task.update!(project: regular_wing, creator: officer_a,
                      description: "Compare the three shortlisted airfoils.",
                      instructions: "Summarize lift, drag, and manufacturability tradeoffs.",
                      start_date: Date.current, due_date: 14.days.from_now.to_date,
                      estimated_hours: 6, status: :backlog)
 backlog_task.assignee_ids = [ member_a.id ]
 
-completed_task = Task.find_or_initialize_by(project: project, title: "Verify spar dimensions")
-completed_task.update!(team: micro, subteam: micro_structures, creator: officer_b,
+completed_task = Task.find_or_initialize_by(title: "Verify spar dimensions")
+completed_task.update!(project: micro_spar, creator: officer_b,
                        description: "Confirm the current spar dimensions against the drawing.",
                        instructions: "Record the drawing revision used.",
                        start_date: 9.days.ago.to_date, due_date: 2.days.ago.to_date,

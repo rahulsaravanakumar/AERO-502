@@ -18,9 +18,13 @@ class DashboardSummary
           @from = @to = nil
      end
 
+     # Permitted, filtered tasks for the selected project, or all projects when none is chosen.
      def tasks
-          @tasks ||= @filter.apply(Task.accessible_to(@user)).where(project: project)
-                         .includes(:team, :assignees, time_entries: :user).order(:due_date, :title).to_a
+          @tasks ||= begin
+               scope = @filter.apply(Task.accessible_to(@user))
+               scope = scope.where(project: project) if project
+               scope.includes(:team, :assignees, time_entries: :user).order(:due_date, :title).to_a
+          end
      end
 
      def status_counts

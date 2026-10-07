@@ -5,8 +5,8 @@ class DashboardController < ApplicationController
      before_action :ensure_leader
 
      def index
-          @projects = Project.active.order(:name)
-          project = Project.find_by(id: params[:project_id]) || default_project
+          @projects = Project.active.includes(subteam: :team).sort_by(&:full_name)
+          project = Project.find_by(id: params[:project_id])
           @summary = DashboardSummary.new(user: current_user, project: project, filter: task_filter,
                                           from: params[:from], to: params[:to])
      end
@@ -17,10 +17,5 @@ class DashboardController < ApplicationController
           return if current_user.leader?
 
           redirect_to tasks_path, alert: "The project dashboard is available to team officers and the Chief Engineer."
-     end
-
-     # The first project that has tasks, so the dashboard opens on real work.
-     def default_project
-          Project.where(id: Task.select(:project_id)).order(:name).first || @projects.first
      end
 end

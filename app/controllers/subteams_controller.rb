@@ -10,14 +10,10 @@ class SubteamsController < OrganizationRecordsController
      end
 
      def parent_options
-          teams = current_user.chief_engineer? ? Team.active : Team.where(id: current_user.team_id)
-          teams.or(Team.where(id: @record.team_id)).order(:name)
+          Team.where(id: team_ids_for_choices).order(:name)
      end
 
-     # Officers manage subteams of their own team, before and after any change.
-     def can_manage?(subteam)
-          return true if current_user.chief_engineer?
-
-          [ subteam.team_id, subteam.team_id_in_database ].compact.all?(current_user.team_id)
+     def team_id_for(subteam)
+          subteam.team_id
      end
 end

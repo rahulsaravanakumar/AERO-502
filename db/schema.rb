@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_07_160000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_07_170000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -19,7 +19,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_160000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "archived_at"
-    t.index ["name"], name: "index_projects_on_name", unique: true
+    t.bigint "subteam_id", null: false
+    t.index ["subteam_id", "name"], name: "index_projects_on_subteam_id_and_name", unique: true
+    t.index ["subteam_id"], name: "index_projects_on_subteam_id"
   end
 
   create_table "subteams", force: :cascade do |t|
@@ -74,7 +76,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_160000) do
     t.integer "status", default: 0, null: false
     t.bigint "project_id", null: false
     t.bigint "team_id", null: false
-    t.bigint "subteam_id"
+    t.bigint "subteam_id", null: false
     t.bigint "creator_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -87,12 +89,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_160000) do
 
   create_table "teams", force: :cascade do |t|
     t.string "name", null: false
-    t.bigint "project_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "archived_at"
-    t.index ["project_id", "name"], name: "index_teams_on_project_id_and_name", unique: true
-    t.index ["project_id"], name: "index_teams_on_project_id"
+    t.index ["name"], name: "index_teams_on_name", unique: true
   end
 
   create_table "time_entries", force: :cascade do |t|
@@ -122,6 +122,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_160000) do
     t.index ["team_id"], name: "index_users_on_team_id"
   end
 
+  add_foreign_key "projects", "subteams"
   add_foreign_key "subteams", "teams"
   add_foreign_key "task_assignments", "tasks"
   add_foreign_key "task_assignments", "users"
@@ -133,7 +134,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_160000) do
   add_foreign_key "tasks", "subteams"
   add_foreign_key "tasks", "teams"
   add_foreign_key "tasks", "users", column: "creator_id"
-  add_foreign_key "teams", "projects"
   add_foreign_key "time_entries", "tasks"
   add_foreign_key "time_entries", "users"
   add_foreign_key "users", "subteams"

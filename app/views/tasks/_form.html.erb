@@ -19,18 +19,9 @@
   <div class="form-grid">
     <div class="field">
       <%= form.label :project_id, "Project" %>
-      <%= form.collection_select :project_id, @projects, :id, :name, { prompt: "Select a project" }, required: true, **field_error_attributes(task, :project) %>
+      <%= form.collection_select :project_id, @projects, :id, :full_name, { prompt: "Select a project" }, required: true, **field_error_attributes(task, :project) %>
+      <p class="hint">Listed as team · subteam · project. The task's team and subteam come from its project.</p>
       <%= field_error(task, :project) %>
-    </div>
-    <div class="field">
-      <%= form.label :team_id, "Team" %>
-      <%= form.collection_select :team_id, @teams, :id, :name, { prompt: "Select a team" }, required: true, **field_error_attributes(task, :team) %>
-      <%= field_error(task, :team) %>
-    </div>
-    <div class="field">
-      <%= form.label :subteam_id, "Subteam (optional)" %>
-      <%= form.collection_select :subteam_id, @subteams, :id, :name, { include_blank: "No subteam" }, **field_error_attributes(task, :subteam) %>
-      <%= field_error(task, :subteam) %>
     </div>
     <% if task.persisted? %>
       <div class="field">

@@ -6,10 +6,11 @@ class TeamsController < OrganizationRecordsController
      end
 
      def parent_field
-          :project_id
+          nil
      end
 
-     def parent_options
-          Project.active.or(Project.where(id: @record.project_id)).order(:name)
+     # Only the Chief Engineer creates, renames or archives teams.
+     def officer_managed?
+          false
      end
 end

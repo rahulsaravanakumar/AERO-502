@@ -85,7 +85,7 @@ RSpec.describe "Effort and dashboard delivery", type: :request do
           expect(card).to be_present
           expect(card.at_css(".task-foot strong").text).to eq("7/8h")
 
-          get root_path
+          get dashboard_path
           expect(response).to have_http_status(:success)
           row = response.parsed_body.css("tbody tr").find { |item| item.text.include?(task.title) }
           expect(row).to be_present
@@ -95,35 +95,30 @@ RSpec.describe "Effort and dashboard delivery", type: :request do
           expect(status_metrics.map { |metric| metric.css("strong, span:last-child").map(&:text) }).to include(
                [ "2", "Backlog" ], [ "1", "In progress" ], [ "0", "Completed" ]
           )
-          workload = response.parsed_body.css(".member-grid article").map { |item| item.text.squish }
-          expect(workload).to include("#{first_member.name} 6.5 hours", "#{second_member.name} 3 hours")
+          workload = response.parsed_body.css("[data-member-hours] tbody tr").map { |item| item.text.squish }
+          expect(workload).to include("#{first_member.name} 18 hours 6.5 hours", "#{second_member.name} 8 hours 3 hours")
      end
 
-     it "shows an assigned shared task once in the member dashboard totals" do
+     it "shows an assigned shared task once on the member's board and keeps the dashboard for leaders" do
           task, first_member, = shared_task_with_hours
           sign_in(first_member)
 
           get root_path
           expect(response).to have_http_status(:success)
-          expect(response.body).to include("Your assignments")
-          expect(response.parsed_body.css("tbody tr").count).to eq(2)
-          expect(response.parsed_body.css("tbody tr").count { |row| row.text.include?(task.title) }).to eq(1)
-          expect(response.parsed_body.at_css(".metric-emphasis strong").text).to eq("9.5h")
+          expect(response.parsed_body.css(".task-card").count).to eq(2)
+          expect(response.parsed_body.css(".task-card").count { |card| card.text.include?(task.title) }).to eq(1)
           expect(response.body).not_to include(tasks(:spar_check).title)
-          expect(response.body).not_to include("Member workload")
+
+          get dashboard_path
+          expect(response).to redirect_to(tasks_path)
      end
 
-     it "explains an empty assignment list on the member dashboard and board" do
+     it "explains an empty assignment list on the member board" do
           member = User.create!(
                name: "Unassigned Member", email: "unassigned@example.test",
                password: "password", role: :member, team: teams(:aerodynamics)
           )
           sign_in(member)
-
-          get root_path
-          expect(response).to have_http_status(:success)
-          expect(response.body).to include("No tasks to show", "No work has been assigned to you yet.")
-          expect(response.parsed_body.at_css(".metric-emphasis strong").text).to eq("0h")
 
           get tasks_path
           expect(response).to have_http_status(:success)

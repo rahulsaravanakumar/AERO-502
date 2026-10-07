@@ -188,3 +188,19 @@ thead th { color: var(--muted); font-size: .78rem; letter-spacing: .06em; text-t
   .form-grid, .metrics { grid-template-columns: 1fr; }
   .site-header { padding-inline: 1rem; }
 }
+
+/* Dashboard filters, lists and member hours chart */
+.filter-bar { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end; margin-bottom: 1.5rem; padding: 1.25rem 1.5rem; }
+.filter-bar .field { margin-bottom: 0; min-width: 11rem; }
+.filter-actions { display: flex; gap: .6rem; }
+.plain-list { margin: 0; padding: 0; list-style: none; }
+.plain-list li { display: flex; flex-direction: column; gap: .2rem; padding: .7rem 0; border-bottom: 1px solid var(--line); }
+.total-row th, .total-row td { font-weight: 800; border-top: 2px solid var(--ink); }
+.bar-chart { margin: 1.5rem 0 0; }
+.bar-chart figcaption { margin-bottom: .75rem; font-weight: 700; }
+.bar-row { display: grid; grid-template-columns: minmax(8rem, 12rem) 1fr; gap: 1rem; align-items: center; margin-bottom: .8rem; }
+.bars { display: grid; gap: .3rem; }
+.bar { display: block; min-width: fit-content; padding: .2rem .5rem; border-radius: 4px; font-size: .82rem; white-space: nowrap; }
+.bar-estimate { background: #e9e1d3; color: var(--ink); }
+.bar-actual { background: var(--maroon); color: white; }
+@media (max-width: 640px) { .bar-row { grid-template-columns: 1fr; gap: .3rem; } }

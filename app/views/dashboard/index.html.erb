@@ -3,20 +3,43 @@
 <div class="page-heading">
   <div>
     <p class="eyebrow"><%= current_user.team&.name || "ALL TEAMS" %></p>
-    <h1><%= current_user.member? ? "Your assignments" : "Project dashboard" %></h1>
+    <h1>Project dashboard</h1>
     <p class="lede">Current status, ownership, and effort in one meeting-ready view.</p>
   </div>
-  <% if current_user.leader? %>
-    <%= link_to "Create task", new_task_path, class: "button" %>
-  <% end %>
+  <%= link_to "Create task", new_task_path, class: "button" %>
 </div>
 
+<%= form_with url: dashboard_path, method: :get, class: "panel filter-bar", aria: { label: "Dashboard filters" } do |form| %>
+  <div class="field">
+    <%= form.label :project_id, "Project" %>
+    <%= form.collection_select :project_id, @projects, :id, :name, selected: @summary.project&.id %>
+  </div>
+  <div class="field">
+    <%= form.label :from, "Hours from" %>
+    <%= form.date_field :from, value: @summary.from %>
+  </div>
+  <div class="field">
+    <%= form.label :to, "Hours to" %>
+    <%= form.date_field :to, value: @summary.to %>
+  </div>
+  <div class="filter-actions">
+    <%= form.submit "Apply", class: "button", name: nil %>
+    <%= link_to "Clear", dashboard_path, class: "button button-secondary" %>
+  </div>
+<% end %>
+
+<% if @summary.errors.any? %>
+  <div class="flash flash-alert" role="alert">
+    <%= @summary.errors.to_sentence %>. Showing hours for all dates.
+  </div>
+<% end %>
+
 <section class="metrics" aria-label="Task status summary">
-  <% Task.statuses.each_key do |status| %>
-    <article class="metric">
+  <% @summary.status_counts.each do |status, count| %>
+    <article class="metric" data-status="<%= status %>">
       <span class="status-dot status-<%= status %>" aria-hidden="true"></span>
       <div>
-        <strong><%= @status_counts[status] || 0 %></strong>
+        <strong><%= count %></strong>
         <span><%= status.humanize %></span>
       </div>
     </article>
@@ -24,10 +47,90 @@
   <article class="metric metric-emphasis">
     <span aria-hidden="true">Σ</span>
     <div>
-      <strong><%= number_with_precision(@tasks.sum(&:total_actual_hours), precision: 1, strip_insignificant_zeros: true) %>h</strong>
+      <strong><%= number_with_precision(@summary.total_actual, precision: 1, strip_insignificant_zeros: true) %>h</strong>
       <span>Actual effort</span>
     </div>
   </article>
+</section>
+
+<div class="detail-grid">
+  <section class="panel" data-overdue>
+    <h2>Overdue tasks</h2>
+    <% if @summary.overdue_tasks.any? %>
+      <ul class="plain-list">
+        <% @summary.overdue_tasks.each do |task| %>
+          <li>
+            <%= link_to task.title, task %>
+            <span class="muted"><%= task.team.name %> · due <%= task.due_date.to_fs(:long) %> · <%= task.status.humanize %></span>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="muted">No overdue tasks.</p>
+    <% end %>
+  </section>
+
+  <section class="panel" data-assignments>
+    <h2>Assignments by member</h2>
+    <% if @summary.member_rows.any? %>
+      <dl class="detail-list">
+        <% @summary.member_rows.each do |row| %>
+          <div>
+            <dt><%= row.member.name %></dt>
+            <dd><%= row.tasks.map(&:title).to_sentence.presence || "No assigned tasks" %></dd>
+          </div>
+        <% end %>
+      </dl>
+    <% else %>
+      <p class="muted">No members are assigned yet.</p>
+    <% end %>
+  </section>
+</div>
+
+<section class="panel" data-member-hours>
+  <div class="section-heading">
+    <h2>Member hour summary</h2>
+    <span class="muted"><%= @summary.from || @summary.to ? "#{@summary.from&.to_fs(:long) || "Start"} – #{@summary.to&.to_fs(:long) || "today"}" : "All dates" %></span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Member</th>
+          <th scope="col">Assigned-task estimate (shared)</th>
+          <th scope="col">Actual hours</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @summary.member_rows.each do |row| %>
+          <tr>
+            <th scope="row"><%= row.member.name %></th>
+            <td><%= estimate_label(row.estimate) %></td>
+            <td><%= estimate_label(row.actual) %></td>
+          </tr>
+        <% end %>
+        <tr class="total-row">
+          <th scope="row">Project total</th>
+          <td><%= estimate_label(@summary.total_estimate) %></td>
+          <td><%= estimate_label(@summary.total_actual) %></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="hint">A shared task's full estimate appears on each assigned member's row; the project total counts each task once.</p>
+
+  <figure class="bar-chart" data-member-chart>
+    <figcaption>Estimated vs. actual hours by member</figcaption>
+    <% @summary.member_rows.each do |row| %>
+      <div class="bar-row" data-member="<%= row.member.name %>" data-actual="<%= row.actual.to_d.to_s("F") %>">
+        <span class="bar-label"><%= row.member.name %></span>
+        <div class="bars">
+          <span class="bar bar-estimate" style="width: <%= (row.estimate / @summary.chart_scale * 100).round(1) %>%"><%= estimate_label(row.estimate) %> estimated</span>
+          <span class="bar bar-actual" style="width: <%= (row.actual / @summary.chart_scale * 100).round(1) %>%"><%= estimate_label(row.actual) %> actual</span>
+        </div>
+      </div>
+    <% end %>
+  </figure>
 </section>
 
 <section class="panel">
@@ -36,7 +139,7 @@
     <%= link_to "Open full board", tasks_path %>
   </div>
 
-  <% if @tasks.any? %>
+  <% if @summary.tasks.any? %>
     <div class="table-wrap">
       <table>
         <thead>
@@ -51,7 +154,7 @@
           </tr>
         </thead>
         <tbody>
-          <% @tasks.each do |task| %>
+          <% @summary.tasks.each do |task| %>
             <tr>
               <th scope="row"><%= link_to task.title, task %></th>
               <td><%= task.team.name %></td>
@@ -68,21 +171,7 @@
   <% else %>
     <div class="empty-state">
       <h3>No tasks to show</h3>
-      <p><%= current_user.member? ? "No work has been assigned to you yet." : "Create the first task for this project." %></p>
+      <p>Create the first task for this project.</p>
     </div>
   <% end %>
 </section>
-
-<% if current_user.leader? && @member_totals.any? %>
-  <section class="panel">
-    <h2>Member workload</h2>
-    <div class="member-grid">
-      <% User.where(id: @member_totals.keys).order(:name).each do |member| %>
-        <article>
-          <span><%= member.name %></span>
-          <strong><%= number_with_precision(@member_totals[member.id], precision: 2, strip_insignificant_zeros: true) %> hours</strong>
-        </article>
-      <% end %>
-    </div>
-  </section>
-<% end %>

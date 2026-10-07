@@ -42,12 +42,12 @@ RSpec.describe "KAN-7, KAN-9, and KAN-12 delivered access and status", type: :re
      it "shows chief engineers both teams and permits cross-team management" do
           sign_in_as(users(:chief))
 
-          [ root_path, tasks_path, task_path(tasks(:spar_check)), edit_task_path(tasks(:spar_check)) ].each do |path|
+          [ root_path, dashboard_path, tasks_path, task_path(tasks(:spar_check)), edit_task_path(tasks(:spar_check)) ].each do |path|
                get path
                expect(response).to have_http_status(:ok)
           end
 
-          get root_path
+          get dashboard_path
           expect(response.body).to include("Wing load test", "Verify spar dimensions", "Create task")
      end
 
@@ -120,11 +120,8 @@ RSpec.describe "KAN-7, KAN-9, and KAN-12 delivered access and status", type: :re
                expect(column).not_to be_nil
                expect(column.text).to include(task.title)
 
-               get root_path
-               expect(response).to have_http_status(:ok)
-               row = Nokogiri::HTML(response.body).css("tbody tr").find { |entry| entry.text.include?(task.title) }
-               expect(row.at_css(".badge")["class"]).to include("status-#{status}")
-               expect(row.text).to include(label)
+               get dashboard_path
+               expect(response).to redirect_to(tasks_path)
           end
      end
 

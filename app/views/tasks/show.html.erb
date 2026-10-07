@@ -46,6 +46,7 @@
         <div><strong><%= number_with_precision(@task.total_actual_hours, precision: 2, strip_insignificant_zeros: true) %>h</strong><span>Actual</span></div>
         <div><strong><%= number_with_precision(@task.variance_hours, precision: 2, strip_insignificant_zeros: true) %>h</strong><span>Variance</span></div>
       </div>
+      <p class="variance-note" data-variance><%= variance_label(@task.variance_hours) %></p>
     </section>
 
     <% if current_user.can_work_on?(@task) %>

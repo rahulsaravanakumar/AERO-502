@@ -99,6 +99,7 @@
           <th scope="col">Member</th>
           <th scope="col">Assigned-task estimate (shared)</th>
           <th scope="col">Actual hours</th>
+          <th scope="col">Difference</th>
         </tr>
       </thead>
       <tbody>
@@ -107,12 +108,14 @@
             <th scope="row"><%= row.member.name %></th>
             <td><%= estimate_label(row.estimate) %></td>
             <td><%= estimate_label(row.actual) %></td>
+            <td><%= variance_label(row.actual - row.estimate) %></td>
           </tr>
         <% end %>
         <tr class="total-row">
           <th scope="row">Project total</th>
           <td><%= estimate_label(@summary.total_estimate) %></td>
           <td><%= estimate_label(@summary.total_actual) %></td>
+          <td><%= variance_label(@summary.total_actual - @summary.total_estimate) %></td>
         </tr>
       </tbody>
     </table>

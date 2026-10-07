@@ -110,6 +110,7 @@ input:focus, select:focus, textarea:focus, a:focus-visible, button:focus-visible
 .check-option input { width: 20px; min-height: 20px; }
 .form-actions { display: flex; gap: .75rem; }
 .subsection-heading { margin-top: 1.75rem; }
+.variance-note { margin: .9rem 0 0; font-weight: 700; color: var(--maroon); }
 .row-actions { display: flex; gap: .75rem; align-items: center; }
 .row-actions .link-button { color: var(--maroon); text-underline-offset: 0.2em; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

@@ -11,7 +11,7 @@ RSpec.describe "Project dashboard", type: :request do
      def summary_rows
           response.parsed_body.css("[data-member-hours] tbody tr").to_h do |row|
                cells = row.css("th, td").map { |cell| cell.text.squish }
-               [ cells.first, cells.drop(1) ]
+               [ cells.first, cells.drop(1).first(2) ]
           end
      end
 

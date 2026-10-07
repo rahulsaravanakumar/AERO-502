@@ -96,7 +96,8 @@ RSpec.describe "Effort and dashboard delivery", type: :request do
                [ "2", "Backlog" ], [ "1", "In progress" ], [ "0", "Completed" ]
           )
           workload = response.parsed_body.css("[data-member-hours] tbody tr").map { |item| item.text.squish }
-          expect(workload).to include("#{first_member.name} 18 hours 6.5 hours", "#{second_member.name} 8 hours 3 hours")
+          expect(workload).to include(a_string_starting_with("#{first_member.name} 18 hours 6.5 hours"),
+                                      a_string_starting_with("#{second_member.name} 8 hours 3 hours"))
      end
 
      it "shows an assigned shared task once on the member's board and keeps the dashboard for leaders" do

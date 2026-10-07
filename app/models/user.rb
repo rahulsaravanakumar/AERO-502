@@ -1,7 +1,8 @@
 class User < ApplicationRecord
      belongs_to :team, optional: true
      belongs_to :subteam, optional: true
-     has_secure_password
+     # Google-only people have no password; practice accounts still use one.
+     has_secure_password validations: false
 
      has_many :task_assignments, dependent: :destroy
      has_many :assigned_tasks, through: :task_assignments, source: :task
@@ -29,6 +30,15 @@ class User < ApplicationRecord
 
      def role_with_article
           ROLES_WITH_ARTICLE.fetch(role)
+     end
+
+     def access_revoked?
+          access_revoked_at.present?
+     end
+
+     # Password sign-in for practice accounts; Google-only people have no password.
+     def authenticate_password_sign_in(password)
+          password_digest.present? && authenticate(password)
      end
 
      def leader?

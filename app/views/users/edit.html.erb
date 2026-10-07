@@ -15,23 +15,7 @@
     </div>
   <% end %>
 
-  <div class="form-grid">
-    <div class="field">
-      <%= form.label :role %>
-      <%= form.select :role, User::ROLE_LABELS.map { |value, label| [ label, value ] }, {}, **field_error_attributes(@user, :role) %>
-      <%= field_error(@user, :role) %>
-    </div>
-    <div class="field">
-      <%= form.label :team_id, "Team" %>
-      <%= form.collection_select :team_id, Team.active.or(Team.where(id: @user.team_id)).order(:name), :id, :name, { include_blank: "No team (Chief Engineer only)" }, **field_error_attributes(@user, :team) %>
-      <%= field_error(@user, :team) %>
-    </div>
-    <div class="field">
-      <%= form.label :subteam_id, "Subteam" %>
-      <%= form.grouped_collection_select :subteam_id, Team.active.order(:name), :active_subteams, :name, :id, :name, { include_blank: "No subteam" }, **field_error_attributes(@user, :subteam) %>
-      <%= field_error(@user, :subteam) %>
-    </div>
-  </div>
+  <%= render "role_fields", form: form, user: @user %>
 
   <div class="form-actions">
     <%= form.submit "Save role", class: "button" %>

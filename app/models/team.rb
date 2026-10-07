@@ -7,8 +7,4 @@ class Team < ApplicationRecord
      has_many :tasks, dependent: :restrict_with_error
 
      validates :name, presence: true, uniqueness: { scope: :project_id, case_sensitive: false }
-
-     def active_subteams
-          subteams.active.order(:name)
-     end
 end

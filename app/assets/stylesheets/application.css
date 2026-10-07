@@ -111,6 +111,9 @@ input:focus, select:focus, textarea:focus, a:focus-visible, button:focus-visible
 .form-actions { display: flex; gap: .75rem; }
 .subsection-heading { margin-top: 1.75rem; }
 .variance-note { margin: .9rem 0 0; font-weight: 700; color: var(--maroon); }
+.google-button { margin: .5rem 0 .75rem; }
+.divider { display: flex; align-items: center; gap: .75rem; margin: 1.25rem 0; color: var(--muted); font-size: .9rem; }
+.divider::before, .divider::after { content: ""; flex: 1; border-top: 1px solid var(--line); }
 .row-actions { display: flex; gap: .75rem; align-items: center; }
 .row-actions .link-button { color: var(--maroon); text-underline-offset: 0.2em; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

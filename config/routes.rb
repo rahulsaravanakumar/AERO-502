@@ -6,8 +6,15 @@ Rails.application.routes.draw do
      get "login", to: "sessions#new"
      post "login", to: "sessions#create"
      delete "logout", to: "sessions#destroy"
+     get "auth/:provider/callback", to: "sessions#omniauth", as: :omniauth_callback
+     get "auth/failure", to: "sessions#failure"
 
-     resources :users, only: %i[index edit update]
+     resources :users, only: %i[index new create edit update] do
+          member do
+               patch :revoke
+               patch :restore
+          end
+     end
 
      get "organization", to: "organization#show"
      concern :archivable do

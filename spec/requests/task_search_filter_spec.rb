@@ -76,7 +76,7 @@ RSpec.describe "Task search and filters", type: :request do
           get tasks_path
           page = response.parsed_body
           expect(page.at_css("#filter_team_id option[selected]").text).to eq("Aerodynamics")
-          expect(page.at_css("#filter_subteam_id option[selected]").text).to eq("Wing Analysis")
+          expect(page.at_css("#filter_subteam_id option[selected]").text).to eq("Aerodynamics · Wing Analysis")
           expect(board_titles).to eq([ "Wing load test" ])
 
           filter

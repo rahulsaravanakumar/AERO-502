@@ -26,6 +26,10 @@ module Aero502
     # SAE AERO works in College Station, so "today" and timestamps use US Central time.
     config.time_zone = "Central Time (US & Canada)"
 
+    # Practice accounts sign in with a password; set PASSWORD_SIGN_IN=off once
+    # everyone signs in with Google.
+    config.x.password_sign_in = ENV.fetch("PASSWORD_SIGN_IN", "on") != "off"
+
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.

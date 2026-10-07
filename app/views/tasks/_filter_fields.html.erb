@@ -9,5 +9,5 @@
 </div>
 <div class="field">
   <%= form.label :subteam_id, "Subteam" %>
-  <%= form.select :subteam_id, option_groups_from_collection_for_select(Team.active.order(:name), :active_subteams, :name, :id, :name, task_filter.subteam_id), include_blank: "All subteams" %>
+  <%= form.select :subteam_id, subteam_options(task_filter.subteam_id), include_blank: "All subteams" %>
 </div>

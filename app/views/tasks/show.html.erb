@@ -18,6 +18,7 @@
       <div><dt>Expected deliverables</dt><dd><%= simple_format(@task.description) %></dd></div>
       <div><dt>Work instructions</dt><dd><%= simple_format(@task.instructions.presence || "No additional instructions.") %></dd></div>
       <div><dt>Assigned members</dt><dd><%= @task.assignees.map(&:name).to_sentence.presence || "Unassigned" %></dd></div>
+      <div data-estimate><dt>Estimated hours</dt><dd><%= estimate_label(@task.estimated_hours) %></dd></div>
       <div><dt>Due date</dt><dd><%= @task.due_date&.to_fs(:long) || "No date" %></dd></div>
       <div><dt>Supporting link</dt><dd><%= @task.link_url.present? ? link_to("Open resource", ERB::Util.html_escape(@task.link_url), target: "_blank", rel: "noopener") : "None" %></dd></div>
     </dl>

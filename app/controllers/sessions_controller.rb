@@ -11,7 +11,8 @@ class SessionsController < ApplicationController
                session[:user_id] = user.id
                redirect_to root_path, notice: "Welcome back, #{user.name}."
           else
-               flash.now[:alert] = "Email or password is incorrect. Please try again."
+               flash.now[:alert] = "Access not authorized. Email or password is incorrect, " \
+                                   "or the account has not been approved yet."
                render :new, status: :unprocessable_entity
           end
      end

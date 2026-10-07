@@ -1,4 +1,6 @@
 class TasksController < ApplicationController
+     OWN_TEAM_ONLY = "You can manage only tasks on your own team.".freeze
+
      before_action :require_sign_in
      before_action :set_task, only: %i[show edit update destroy]
      before_action :ensure_can_view_task, only: :show
@@ -79,10 +81,11 @@ class TasksController < ApplicationController
      end
 
      def ensure_can_manage_task
-          deny_access unless current_user.can_manage?(@task)
+          deny_access(OWN_TEAM_ONLY) unless current_user.can_manage?(@task)
      end
 
      def update_status_as_member
+          return deny_access(OWN_TEAM_ONLY) if current_user.leader?
           unless current_user.can_work_on?(@task)
                return deny_access("You can update only tasks assigned to you.")
           end

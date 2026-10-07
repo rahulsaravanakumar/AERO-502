@@ -35,5 +35,5 @@
 - Controllers coordinate requests while models own validation, relationships, totals, and access scopes.
 - Reusable partials and centralized CSS avoid duplicated form and layout logic.
 - Migrations, seeds, health endpoint, CI, deployment, backup, rollback, and training instructions are versioned with the code.
-- RSpec runs model and request specs; SimpleCov enforces 100% line coverage.
+- RSpec runs model and request specs; SimpleCov enforces 100% line and branch coverage.
 - Coverage evidence: run `bundle exec rspec` and open `coverage/index.html` for the line-by-line report, or open a CI run on GitHub (Actions → CI → test job) where the job summary shows overall and per-file line and branch coverage with any uncovered lines. The full HTML report is attached to each run as the `rspec-coverage` artifact.

@@ -19,7 +19,7 @@ All seeded accounts use the password `AeroSprint1!` unless the deployer sets `DE
 
 1. Open the supplied application URL.
 2. Enter your practice email and password.
-3. Select **Sign in**. A wrong password leaves you signed out and explains that the email or password is incorrect.
+3. Select **Sign in**. A wrong password, or an account that has not been approved, leaves you signed out with the message "Access not authorized"; check the email and password, or ask the Chief Engineer to approve your account.
 4. Use **Sign out** in the header when finished.
 
 Every field and action can be reached with Tab and activated with Enter or Space.

@@ -23,12 +23,15 @@
           <%= link_to "Dashboard", root_path %>
           <%= link_to "Tasks", tasks_path %>
           <%= link_to "My Tasks", tasks_path(view: "mine") %>
+          <% if current_user.chief_engineer? %>
+            <%= link_to "People", users_path %>
+          <% end %>
           <% if current_user.leader? %>
             <%= link_to "New Task", new_task_path, class: "button button-small" %>
           <% end %>
         </nav>
         <div class="account">
-          <span><%= current_user.name %> · <%= current_user.role.humanize %></span>
+          <span><%= current_user.name %> · <%= current_user.role_label %></span>
           <%= button_to "Sign out", logout_path, method: :delete, class: "link-button" %>
         </div>
       <% end %>

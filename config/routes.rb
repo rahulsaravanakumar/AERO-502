@@ -3,6 +3,7 @@ Rails.application.routes.draw do
 
      # The leader dashboard is presented as "Progress"; old /dashboard links still work.
      get "progress", to: "dashboard#index", as: :dashboard
+     resource :timeline, only: :show
      get "dashboard", to: redirect { |_params, request| [ "/progress", request.query_string.presence ].compact.join("?") }
 
      get "login", to: "sessions#new"

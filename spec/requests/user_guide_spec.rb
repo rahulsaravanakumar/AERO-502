@@ -32,6 +32,7 @@ RSpec.describe "User guide", type: :request do
                TasksController::OWN_TEAM_ONLY, "You can update only tasks assigned to you.",
                "You cannot view that task.", "You can change only your own hours.",
                "Team progress is available to team officers and the Chief Engineer.",
+               "The timeline is available to team officers and the Chief Engineer.",
                "Only the Chief Engineer can manage people and roles.",
                "You can manage only your own team's subteams and projects.",
                "Google sign-in was cancelled or failed"

@@ -24,6 +24,7 @@
           <%= link_to "My Tasks", tasks_path(view: "mine") %>
           <% if current_user.leader? %>
             <%= link_to "Progress", dashboard_path %>
+            <%= link_to "Timeline", timeline_path %>
             <%= link_to "Teams", organization_path %>
           <% end %>
           <% if current_user.chief_engineer? %>

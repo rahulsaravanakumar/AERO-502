@@ -8,10 +8,10 @@ RSpec.describe "Progress page", type: :request do
           response.parsed_body.css("nav[aria-label='Primary navigation'] a").map { |link| link.text.squish }
      end
 
-     it "lists Tasks first, then Progress, with Help last" do
+     it "lists Tasks first, then Progress and Timeline, with Help last" do
           sign_in(users(:chief))
           get tasks_path
-          expect(nav_links).to eq([ "Tasks", "My Tasks", "Progress", "Teams", "People", "Help", "New Task" ])
+          expect(nav_links).to eq([ "Tasks", "My Tasks", "Progress", "Timeline", "Teams", "People", "Help", "New Task" ])
 
           sign_in(users(:member))
           get tasks_path

@@ -1,0 +1,141 @@
+<% content_for :title, "Timeline · AERO Task Hub" %>
+<% timeline = @timeline %>
+
+<div class="page-heading">
+  <div>
+    <p class="eyebrow"><%= current_user.team&.name || "ALL TEAMS" %></p>
+    <h1>Timeline</h1>
+    <p class="lede">Each task as a bar from its start date to its due date, grouped by team and subteam.</p>
+  </div>
+</div>
+
+<%= form_with url: timeline_path, method: :get, class: "panel filter-bar", aria: { label: "Timeline filters" } do |form| %>
+  <%= fields :filter do |filter_form| %>
+    <%= render "tasks/filter_fields", form: filter_form %>
+  <% end %>
+  <div class="field gantt-weeks-field">
+    <%= form.label :weeks, "Show" %>
+    <%= form.select :weeks, TaskTimeline::WEEK_OPTIONS.map { |count| [ "#{count} weeks", count ] }, selected: timeline.weeks %>
+  </div>
+  <%= hidden_field_tag :from, timeline.from, id: nil %>
+  <div class="filter-actions">
+    <%= form.submit "Apply", class: "button", name: nil %>
+    <%= link_to "Clear", timeline_path(filter: { q: "" }, weeks: timeline.weeks), class: "button button-secondary" %>
+  </div>
+<% end %>
+
+<section class="panel gantt-panel" aria-labelledby="gantt-heading">
+  <div class="gantt-toolbar">
+    <h2 id="gantt-heading"><%= timeline.from.to_fs(:long) %> – <%= timeline.to.to_fs(:long) %></h2>
+    <div class="gantt-nav">
+      <%= link_to "‹ Previous", timeline_path(from: timeline.previous_from, weeks: timeline.weeks), class: "button button-secondary button-small", data: { nav: "previous" } %>
+      <%= link_to "This week", timeline_path(weeks: timeline.weeks), class: "button button-secondary button-small", data: { nav: "today" } %>
+      <%= link_to "Next ›", timeline_path(from: timeline.next_from, weeks: timeline.weeks), class: "button button-secondary button-small", data: { nav: "next" } %>
+    </div>
+  </div>
+
+  <ul class="gantt-legend" aria-label="Legend">
+    <li><i class="gantt-swatch status-backlog"></i>Backlog</li>
+    <li><i class="gantt-swatch status-in_progress"></i>In progress</li>
+    <li><i class="gantt-swatch status-completed"></i>Completed</li>
+    <li><i class="gantt-swatch gantt-overdue"></i>Overdue</li>
+    <li><i class="gantt-swatch gantt-today-swatch"></i>Today</li>
+  </ul>
+
+  <% if timeline.tasks.empty? %>
+    <p class="muted">No tasks match these filters.</p>
+  <% else %>
+    <div class="gantt-scroll">
+      <div class="gantt" data-gantt data-from="<%= timeline.from.iso8601 %>" style="--days: <%= timeline.days.size %>">
+        <div class="gantt-head">
+          <div class="gantt-corner">Task</div>
+          <div class="gantt-axis">
+            <% timeline.week_starts.each do |week| %>
+              <div class="gantt-week" data-week><%= week.strftime("%b %-d") %></div>
+            <% end %>
+            <% timeline.days.each do |day| %>
+              <div class="gantt-day<%= " is-monday" if day.monday? %><%= " is-weekend" if day.saturday? || day.sunday? %><%= " is-today" if day == Date.current %>" data-day>
+                <span><%= day.strftime("%a")[0] %></span><%= day.day %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+
+        <% timeline.groups.each do |team, subteams| %>
+          <section class="gantt-team" data-gantt-team="<%= team.id %>">
+            <div class="gantt-team-label"><%= team.name %></div>
+            <% subteams.each do |subteam, tasks| %>
+              <section class="gantt-subteam" data-gantt-subteam="<%= subteam.id %>">
+                <div class="gantt-subteam-label"><%= subteam.name %></div>
+                <% tasks.each do |task| %>
+                  <% bar = timeline.bar_for(task) %>
+                  <% overdue = timeline.overdue?(task) %>
+                  <div class="gantt-row" data-gantt-row data-task-id="<%= task.id %>">
+                    <div class="gantt-task">
+                      <%= link_to task.title, task %>
+                      <span class="muted"><%= task.assignees.map(&:name).to_sentence.presence || "Unassigned" %></span>
+                    </div>
+                    <div class="gantt-track">
+                      <% if bar %>
+                        <span class="gantt-bar status-<%= task.status %><%= " gantt-overdue" if overdue %><%= " clipped-start" if bar.clipped_start %><%= " clipped-end" if bar.clipped_end %>"
+                              style="grid-column: <%= bar.offset + 1 %> / span <%= bar.span %>"
+                              title="<%= task.title %>: <%= task.start_date.to_fs(:long) %> – <%= task.due_date.to_fs(:long) %>"
+                              data-bar data-offset="<%= bar.offset %>" data-span="<%= bar.span %>" data-status="<%= task.status %>"
+                              data-overdue="<%= overdue %>" data-clipped-start="<%= bar.clipped_start %>"></span>
+                      <% elsif task.due_date < timeline.from %>
+                        <span class="gantt-outside earlier" data-outside>‹ Earlier · due <%= task.due_date.strftime("%b %-d") %></span>
+                      <% else %>
+                        <span class="gantt-outside later" data-outside>Later · starts <%= task.start_date.strftime("%b %-d") %> ›</span>
+                      <% end %>
+                    </div>
+                  </div>
+                <% end %>
+              </section>
+            <% end %>
+          </section>
+        <% end %>
+
+        <% if timeline.today_offset %>
+          <div class="gantt-today" data-today data-offset="<%= timeline.today_offset %>" style="--offset: <%= timeline.today_offset %>" aria-hidden="true"></div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</section>
+
+<section class="panel" data-timeline-list>
+  <h2>Dates as a list</h2>
+  <p class="muted panel-note">The same start and due dates in text.</p>
+  <% if timeline.tasks.any? %>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Task</th>
+            <th scope="col">Team · Subteam</th>
+            <th scope="col">Start</th>
+            <th scope="col">Due</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% timeline.groups.each do |_team, subteams| %>
+            <% subteams.each do |subteam, tasks| %>
+              <% tasks.each do |task| %>
+                <tr>
+                  <th scope="row"><%= link_to task.title, task %></th>
+                  <td><%= subteam.full_name %></td>
+                  <td><%= task.start_date.to_fs(:long) %></td>
+                  <td><%= task.due_date.to_fs(:long) %></td>
+                  <td><%= task.status.humanize %><%= " · Overdue" if timeline.overdue?(task) %></td>
+                </tr>
+              <% end %>
+            <% end %>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <p class="muted">No tasks match these filters.</p>
+  <% end %>
+</section>

@@ -23,7 +23,7 @@ Members see the tasks assigned to them. Officers see their own team's tasks; the
 
 ## Search and filter tasks
 
-1. On the board, My Tasks or the Progress page, type a word in **Search tasks** to match task titles and descriptions.
+1. On the board, My Tasks, Progress or the Timeline, type a word in **Search tasks** to match task titles and descriptions.
 2. Choose a **Team** and, if needed, a **Subteam**. Subteams are listed with their team, for example "Regular Class · Aerodynamics".
 3. Select **Apply**. Only tasks matching the search and both filters are shown.
 4. Select **Clear** to show every task you are allowed to see again.
@@ -73,6 +73,13 @@ Open a task you manage and read **History**. Each line gives the date and time, 
 2. Choose a project, or leave **All projects**, add any search or team filters, and select **Apply**. The page shows status and overdue counts, tasks that need attention, who is working on what, and every task.
 3. Under **Hours by member**, set **Hours from** and **Hours to** (both dates are included) and select **Show hours**. Each member's actual hours are shown against their assigned-task estimate as a chart and as a table with the difference.
 
+### Timeline
+
+1. Select **Timeline**. Each task is a bar from its start date to its due date, grouped by team and subteam. Gray is Backlog, blue is In progress, green is Completed, and red stripes mean overdue. The red vertical line is today.
+2. Choose how many weeks to **Show** and use the search, team and subteam filters, then select **Apply**.
+3. Use **‹ Previous**, **This week** and **Next ›** to move through time. A task outside the shown weeks says "Earlier" or "Later" on its row.
+4. **Dates as a list** below the chart gives the same start and due dates in text.
+
 ### Teams, subteams and projects
 
 1. Select **Teams**. Each class (team) lists its subteams, and each subteam lists its projects.
@@ -111,5 +118,6 @@ The Chief Engineer manages every team. Officers manage subteams and projects in 
 | You can manage only tasks on your own team. | An officer tried to change another team's task. | Ask that team's officer or the Chief Engineer. |
 | Project must belong to your team | An officer chose another team's project. | Choose one of your team's projects. |
 | Team progress is available to team officers and the Chief Engineer. | Members cannot open Progress. | Use Tasks and My Tasks instead. |
+| The timeline is available to team officers and the Chief Engineer. | Members cannot open the timeline. | Use Tasks and My Tasks to see your dates. |
 | You can manage only your own team's subteams and projects. | An officer tried to change another team's group. | Ask the Chief Engineer. |
 | Only the Chief Engineer can manage people and roles. | Only the Chief Engineer can open People. | Ask the Chief Engineer to make the change. |

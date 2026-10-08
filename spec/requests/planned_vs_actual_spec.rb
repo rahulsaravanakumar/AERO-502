@@ -25,7 +25,7 @@ RSpec.describe "Planned vs. actual effort", type: :request do
      it "shows each member's estimated hours, actual hours and difference in the leader summary" do
           TimeEntry.create!(task: tasks(:wing_test), user: users(:member), hours: 9, worked_on: Date.new(2026, 9, 28))
           sign_in(users(:chief))
-          get dashboard_path
+          get tasks_path
 
           rows = response.parsed_body.css("[data-member-hours] tbody tr").to_h do |row|
                cells = row.css("th, td").map { |cell| cell.text.squish }

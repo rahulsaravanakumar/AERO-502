@@ -16,6 +16,10 @@
     <%= hidden_field_tag :view, "mine", id: nil %>
   <% end %>
   <%= render "tasks/filter_fields", form: form %>
+  <% if @hours %>
+    <%= hidden_field_tag :from, @hours.from, id: nil if @hours.from %>
+    <%= hidden_field_tag :to, @hours.to, id: nil if @hours.to %>
+  <% end %>
   <div class="filter-actions">
     <%= form.submit "Apply", class: "button", name: nil %>
     <%= link_to "Clear", tasks_path(view: (@view if @view == "mine"), filter: { q: "" }), class: "button button-secondary" %>
@@ -28,6 +32,16 @@
     <p>No tasks match your search or filters.</p>
   </div>
 <% elsif @tasks.any? %>
+  <% if @hours %>
+    <p class="board-summary" data-board-summary>
+      <strong class="<%= "summary-alert" if @tasks.any?(&:overdue?) %>"><%= @tasks.count(&:overdue?) %> overdue</strong>
+      <span aria-hidden="true">·</span>
+      <%= number_with_precision(@hours.total_actual, precision: 1, strip_insignificant_zeros: true) %>h actual of
+      <%= number_with_precision(@hours.total_estimate, precision: 1, strip_insignificant_zeros: true) %>h estimated
+      <span aria-hidden="true">·</span>
+      <%= link_to "Hours by member", "#hours" %>
+    </p>
+  <% end %>
   <div class="task-board">
     <% Task.statuses.each_key do |status| %>
       <section class="task-column" aria-labelledby="<%= status %>-heading">
@@ -39,7 +53,10 @@
           <article class="task-card">
             <div class="task-meta">
               <span><%= task.team.name %></span>
-              <span>Due <%= task.due_date.to_fs(:short) %></span>
+              <span>
+                <% if task.overdue? %><span class="overdue-label">Overdue</span><% end %>
+                Due <%= task.due_date.to_fs(:short) %>
+              </span>
             </div>
             <h3><%= link_to task.title, task %></h3>
             <p><%= truncate(task.description, length: 110) %></p>
@@ -52,6 +69,7 @@
       </section>
     <% end %>
   </div>
+  <%= render "tasks/hours", hours: @hours if @hours %>
 <% else %>
   <div class="panel empty-state">
     <h2>No tasks found</h2>

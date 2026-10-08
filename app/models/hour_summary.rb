@@ -1,14 +1,12 @@
-# Figures for the leader dashboard: status counts, assignments, overdue work
-# and each member's estimated vs. actual hours for an optional date range.
-class DashboardSummary
+# Each member's estimated vs. actual hours for the tasks on the board, over an
+# optional date range (scope S07). Shown to leaders below the task board.
+class HourSummary
      MemberRow = Struct.new(:member, :tasks, :estimate, :actual)
 
-     attr_reader :project, :from, :to, :errors
+     attr_reader :tasks, :from, :to, :errors
 
-     def initialize(user:, project:, filter: TaskFilter.new, from: nil, to: nil)
-          @user = user
-          @project = project
-          @filter = filter
+     def initialize(tasks:, from: nil, to: nil)
+          @tasks = tasks
           @errors = []
           @from = parse_date(from, "Start date")
           @to = parse_date(to, "End date")
@@ -16,23 +14,6 @@ class DashboardSummary
 
           @errors << "End date must be on or after the start date"
           @from = @to = nil
-     end
-
-     # Permitted, filtered tasks for the selected project, or all projects when none is chosen.
-     def tasks
-          @tasks ||= begin
-               scope = @filter.apply(Task.accessible_to(@user))
-               scope = scope.where(project: project) if project
-               scope.includes(:team, :assignees, time_entries: :user).order(:due_date, :title).to_a
-          end
-     end
-
-     def status_counts
-          Task.statuses.keys.index_with { |status| tasks.count { |task| task.status == status } }
-     end
-
-     def overdue_tasks
-          tasks.select { |task| !task.completed? && task.due_date < Date.current }
      end
 
      def member_rows

@@ -69,7 +69,7 @@
                 <div class="gantt-subteam-label"><%= subteam.name %></div>
                 <% tasks.each do |task| %>
                   <% bar = timeline.bar_for(task) %>
-                  <% overdue = timeline.overdue?(task) %>
+                  <% overdue = task.overdue? %>
                   <div class="gantt-row" data-gantt-row data-task-id="<%= task.id %>">
                     <div class="gantt-task">
                       <%= link_to task.title, task %>
@@ -127,7 +127,7 @@
                   <td><%= subteam.full_name %></td>
                   <td><%= task.start_date.to_fs(:long) %></td>
                   <td><%= task.due_date.to_fs(:long) %></td>
-                  <td><%= task.status.humanize %><%= " · Overdue" if timeline.overdue?(task) %></td>
+                  <td><%= task.status.humanize %><%= " · Overdue" if task.overdue? %></td>
                 </tr>
               <% end %>
             <% end %>

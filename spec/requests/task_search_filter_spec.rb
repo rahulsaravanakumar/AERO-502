@@ -49,24 +49,22 @@ RSpec.describe "Task search and filters", type: :request do
           expect(response.body).not_to include("Verify spar dimensions")
      end
 
-     it "keeps the chosen filters on My Tasks and the dashboard, which return the same tasks" do
+     it "keeps the chosen filters on My Tasks and the timeline, which return the same tasks" do
           sign_in(users(:chief))
           filter(team_id: teams(:structures).id)
 
           get tasks_path(view: "mine")
           expect(response.parsed_body.at_css("#filter_team_id option[selected]").text).to eq("Structures")
 
-          get dashboard_path
-          dashboard_titles = response.parsed_body.css("[data-task-overview] tbody th").map { |cell| cell.text.squish }
-          expect(dashboard_titles).to eq([ "Verify spar dimensions" ])
-          counts = response.parsed_body.css(".metrics [data-status]").to_h { |metric| [ metric["data-status"], metric.at_css("strong").text ] }
-          expect(counts).to eq("backlog" => "0", "in_progress" => "1", "completed" => "0")
+          get timeline_path
+          timeline_titles = response.parsed_body.css("[data-timeline-list] tbody th").map { |cell| cell.text.squish }
+          expect(timeline_titles).to eq([ "Verify spar dimensions" ])
 
           names = response.parsed_body.css(".filter-bar input, .filter-bar select").map { |field| field["name"] }
-          expect(names).to include("filter[q]", "filter[team_id]", "filter[subteam_id]")
+          expect(names).to include("filter[q]", "filter[project_id]", "filter[team_id]", "filter[subteam_id]")
 
-          get dashboard_path(filter: { q: "", team_id: "", subteam_id: "" })
-          expect(response.parsed_body.css("[data-task-overview] tbody th").size).to eq(2)
+          get timeline_path(filter: { q: "", team_id: "", subteam_id: "" })
+          expect(response.parsed_body.css("[data-timeline-list] tbody th").size).to eq(2)
      end
 
      it "opens a member's board on their own team and subteam, which they can clear" do
@@ -90,7 +88,7 @@ RSpec.describe "Task search and filters", type: :request do
           get tasks_path
 
           controls = response.parsed_body.css(".filter-bar input[type=search], .filter-bar select")
-          expect(controls.size).to eq(3)
+          expect(controls.size).to eq(4)
           controls.each do |control|
                expect(response.parsed_body.at_css("label[for='#{control["id"]}']")).to be_present
           end

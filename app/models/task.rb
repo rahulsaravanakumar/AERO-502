@@ -61,6 +61,11 @@ class Task < ApplicationRecord
           (previous_ids - user_ids.map(&:to_i)).each { |id| record_assignment("unassigned", id, actor) }
      end
 
+     # Unfinished and past its due date.
+     def overdue?
+          !completed? && due_date < Date.current
+     end
+
      def total_actual_hours
           return time_entries.sum(&:hours) if time_entries.loaded?
 

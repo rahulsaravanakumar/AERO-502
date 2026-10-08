@@ -11,13 +11,17 @@ class TasksController < ApplicationController
 
      def index
           @tasks = task_filter.apply(Task.accessible_to(current_user))
-                              .includes(:project, :team, :assignees, :time_entries)
+                              .includes(:project, :team, :assignees, time_entries: :user)
                               .order(:status, :due_date, :title)
           @view = params[:view] == "mine" ? "mine" : "board"
           if @view == "mine"
                @tasks = @tasks.joins(:task_assignments)
                               .where(task_assignments: { user_id: current_user.id })
           end
+          # Leaders see member hours for the tasks on the board (scope S07, KAN-29).
+          return unless @view == "board" && current_user.leader?
+
+          @hours = HourSummary.new(tasks: @tasks.to_a, from: params[:from], to: params[:to])
      end
 
      def show

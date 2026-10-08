@@ -311,3 +311,10 @@ thead th { color: var(--muted); font-size: .78rem; letter-spacing: .06em; text-t
 .gantt-outside { grid-column: 1 / -1; grid-row: 1; padding: 0 .6rem; font-size: .78rem; font-style: italic; color: var(--muted); }
 .gantt-outside.later { justify-self: end; }
 .gantt-today { position: absolute; top: 0; bottom: 0; left: calc(var(--label) + (100% - var(--label)) * (var(--offset) + .5) / var(--days)); width: 2px; background: #c0392b; z-index: 1; pointer-events: none; }
+
+/* Board summary, overdue labels and hours (KAN-29) */
+.board-summary { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; margin: 0 0 1rem; color: var(--muted); }
+.board-summary strong { color: var(--ink); }
+.board-summary .summary-alert { color: #a22929; }
+.overdue-label { display: inline-block; margin-right: .35rem; padding: .05rem .45rem; border-radius: 999px; background: #a22929; color: white; font-size: .72rem; font-weight: 800; letter-spacing: .02em; }
+.hours-panel { margin-top: 1.5rem; scroll-margin-top: 1rem; }

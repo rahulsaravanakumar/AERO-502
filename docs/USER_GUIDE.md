@@ -23,12 +23,12 @@ Members see the tasks assigned to them. Officers see their own team's tasks; the
 
 ## Search and filter tasks
 
-1. On the board, My Tasks, Progress or the Timeline, type a word in **Search tasks** to match task titles and descriptions.
-2. Choose a **Team** and, if needed, a **Subteam**. Subteams are listed with their team, for example "Regular Class · Aerodynamics".
+1. On the board, My Tasks or the Timeline, type a word in **Search tasks** to match task titles and descriptions.
+2. Choose a **Project**, a **Team** and, if needed, a **Subteam**. Projects are listed as "Team · Subteam · Project". Subteams are listed with their team, for example "Regular Class · Aerodynamics".
 3. Select **Apply**. Only tasks matching the search and both filters are shown.
 4. Select **Clear** to show every task you are allowed to see again.
 
-Your filters stay applied when you move between the board, My Tasks and Progress. A member's board first opens on their own team and subteam.
+Your filters stay applied when you move between the board, My Tasks and the Timeline. A member's board first opens on their own team and subteam.
 
 ## Update task status
 
@@ -67,11 +67,13 @@ You can change only entries you recorded yourself.
 
 Open a task you manage and read **History**. Each line gives the date and time, who acted, and what happened in words, for example "Olivia Officer removed Bailey Member" or "changed the status from Backlog to In progress". The newest entry is first, and history cannot be edited or deleted.
 
-### Progress (the project dashboard)
+### Board summary and hours (the project dashboard)
 
-1. Select **Progress**. This is the leader dashboard described in the acceptance tests.
-2. Choose a project, or leave **All projects**, add any search or team filters, and select **Apply**. The page shows status and overdue counts, tasks that need attention, who is working on what, and every task.
-3. Under **Hours by member**, set **Hours from** and **Hours to** (both dates are included) and select **Show hours**. Each member's actual hours are shown against their assigned-task estimate as a chart and as a table with the difference.
+The task board doubles as the leader dashboard described in the acceptance tests.
+
+1. Select **Tasks**. Each column heading shows how many tasks are in it, and any unfinished task past its due date shows a red **Overdue** label.
+2. Choose a **Project**, team, subteam or search, and select **Apply**. The line above the board shows how many tasks are overdue and the actual hours against the estimate for the tasks shown.
+3. Scroll to **Hours by member** below the board (or select its link above the board). Set **Hours from** and **Hours to** (both dates are included) and select **Show hours**. Each member's actual hours are shown against their assigned-task estimate as a chart and as a table with the difference.
 
 ### Timeline
 
@@ -109,15 +111,14 @@ The Chief Engineer manages every team. Officers manage subteams and projects in 
 | Hours must be greater than 0 | Zero or a negative number was entered. | Enter a number above 0. |
 | Hours for (date) would total (number); a member can record at most 24 hours per day | Your hours for that date across all tasks would pass 24. | Check your other entries for that date, then enter fewer hours or a different date. |
 | Due date must be on or after the start date | The due date is earlier than the start date. | Choose a due date on or after the start date. |
-| End date must be on or after the start date | On Progress, Hours to is earlier than Hours from. | Choose a later Hours to date, or select Clear. |
-| Start date is not a valid date / End date is not a valid date | Progress could not read a date. | Pick the date with the date picker or type it as YYYY-MM-DD. |
+| End date must be on or after the start date | Under Hours by member, Hours to is earlier than Hours from. | Choose a later Hours to date, or select Clear. |
+| Start date is not a valid date / End date is not a valid date | Hours by member could not read a date. | Pick the date with the date picker or type it as YYYY-MM-DD. |
 | Reference links must each be a full web address starting with http:// or https:// | A reference link is incomplete. | Put one full address per line, for example `https://example.com/plan`. |
 | You can update only tasks assigned to you. | You tried to change a task that is not yours. | Ask an officer to assign you, or update one of your own tasks. |
 | You cannot view that task. | The task belongs to work you are not allowed to see. | Return to Tasks or My Tasks. |
 | You can change only your own hours. | You tried to edit or delete someone else's entry. | Ask that member to correct their own entry. |
 | You can manage only tasks on your own team. | An officer tried to change another team's task. | Ask that team's officer or the Chief Engineer. |
 | Project must belong to your team | An officer chose another team's project. | Choose one of your team's projects. |
-| Team progress is available to team officers and the Chief Engineer. | Members cannot open Progress. | Use Tasks and My Tasks instead. |
 | The timeline is available to team officers and the Chief Engineer. | Members cannot open the timeline. | Use Tasks and My Tasks to see your dates. |
 | You can manage only your own team's subteams and projects. | An officer tried to change another team's group. | Ask the Chief Engineer. |
 | Only the Chief Engineer can manage people and roles. | Only the Chief Engineer can open People. | Ask the Chief Engineer to make the change. |

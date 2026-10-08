@@ -1,0 +1,71 @@
+<%# Member hours for the tasks on the board (scope S07), shown to leaders. %>
+<section class="panel hours-panel" id="hours" data-member-hours>
+  <div class="section-heading hours-heading">
+    <div>
+      <h2>Hours by member</h2>
+      <p class="muted panel-note"><%= hours.from || hours.to ? "#{hours.from&.to_fs(:long) || "Start"} – #{hours.to&.to_fs(:long) || "today"}" : "All dates" %> · tasks shown on the board</p>
+    </div>
+    <%= form_with url: tasks_path(anchor: "hours"), method: :get, class: "range-form", data: { hours_range: true }, aria: { label: "Hours date range" } do |form| %>
+      <div class="field">
+        <%= form.label :from, "Hours from" %>
+        <%= form.date_field :from, value: hours.from %>
+      </div>
+      <div class="field">
+        <%= form.label :to, "Hours to" %>
+        <%= form.date_field :to, value: hours.to %>
+      </div>
+      <%= form.submit "Show hours", class: "button button-secondary", name: nil %>
+    <% end %>
+  </div>
+
+  <% if hours.errors.any? %>
+    <div class="flash flash-alert" role="alert"><%= hours.errors.to_sentence %>. Showing hours for all dates.</div>
+  <% end %>
+
+  <figure class="bar-chart" data-member-chart aria-hidden="true">
+    <div class="chart-legend">
+      <span><i class="legend-swatch legend-actual"></i>Actual hours</span>
+      <span><i class="legend-swatch legend-estimate"></i>Assigned-task estimate</span>
+    </div>
+    <% hours.member_rows.each do |row| %>
+      <div class="bar-row" data-member="<%= row.member.name %>" data-actual="<%= row.actual.to_d.to_s("F") %>">
+        <span class="bar-label"><%= row.member.name %></span>
+        <span class="bar-track">
+          <span class="bar-estimate" style="width: <%= (row.estimate / hours.chart_scale * 100).round(1) %>%"></span>
+          <span class="bar-actual" style="width: <%= (row.actual / hours.chart_scale * 100).round(1) %>%"></span>
+        </span>
+        <span class="bar-value"><%= number_with_precision(row.actual, precision: 1, strip_insignificant_zeros: true) %> / <%= number_with_precision(row.estimate, precision: 1, strip_insignificant_zeros: true) %>h</span>
+      </div>
+    <% end %>
+  </figure>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Member</th>
+          <th scope="col">Assigned-task estimate (shared)</th>
+          <th scope="col">Actual hours</th>
+          <th scope="col">Difference</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% hours.member_rows.each do |row| %>
+          <tr>
+            <th scope="row"><%= row.member.name %></th>
+            <td><%= estimate_label(row.estimate) %></td>
+            <td><%= estimate_label(row.actual) %></td>
+            <td><%= variance_label(row.actual - row.estimate) %></td>
+          </tr>
+        <% end %>
+        <tr class="total-row">
+          <th scope="row">Project total</th>
+          <td><%= estimate_label(hours.total_estimate) %></td>
+          <td><%= estimate_label(hours.total_actual) %></td>
+          <td><%= variance_label(hours.total_actual - hours.total_estimate) %></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="hint">A shared task's full estimate appears on each assigned member's row; the total counts each task once.</p>
+</section>

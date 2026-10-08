@@ -56,10 +56,6 @@ class TaskTimeline
                   clipped_start: task.start_date < from, clipped_end: task.due_date > to)
      end
 
-     def overdue?(task)
-          !task.completed? && task.due_date < Date.current
-     end
-
      private
 
      def parse_date(value)

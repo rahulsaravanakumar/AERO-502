@@ -42,13 +42,13 @@ RSpec.describe "KAN-7, KAN-9, and KAN-12 delivered access and status", type: :re
      it "shows chief engineers both teams and permits cross-team management" do
           sign_in_as(users(:chief))
 
-          [ root_path, dashboard_path, tasks_path, task_path(tasks(:spar_check)), edit_task_path(tasks(:spar_check)) ].each do |path|
+          [ root_path, tasks_path, task_path(tasks(:spar_check)), edit_task_path(tasks(:spar_check)) ].each do |path|
                get path
                expect(response).to have_http_status(:ok)
           end
 
-          get dashboard_path
-          expect(response.body).to include("Wing load test", "Verify spar dimensions", "Create task")
+          get tasks_path
+          expect(response.body).to include("Wing load test", "Verify spar dimensions", "New Task")
      end
 
      it "shows officers only their team and denies cross-team management" do
@@ -119,9 +119,6 @@ RSpec.describe "KAN-7, KAN-9, and KAN-12 delivered access and status", type: :re
                end
                expect(column).not_to be_nil
                expect(column.text).to include(task.title)
-
-               get dashboard_path
-               expect(response).to redirect_to(tasks_path)
           end
      end
 

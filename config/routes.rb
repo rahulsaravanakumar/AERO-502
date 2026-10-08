@@ -1,10 +1,11 @@
 Rails.application.routes.draw do
      root "tasks#index"
 
-     # The leader dashboard is presented as "Progress"; old /dashboard links still work.
-     get "progress", to: "dashboard#index", as: :dashboard
+     # The leader dashboard was merged into the task board (KAN-29); old links go to its hours.
+     board_hours = redirect { |_params, request| "#{[ "/tasks", request.query_string.presence ].compact.join("?")}#hours" }
+     get "progress", to: board_hours
      resource :timeline, only: :show
-     get "dashboard", to: redirect { |_params, request| [ "/progress", request.query_string.presence ].compact.join("?") }
+     get "dashboard", to: board_hours
 
      get "login", to: "sessions#new"
      post "login", to: "sessions#create"

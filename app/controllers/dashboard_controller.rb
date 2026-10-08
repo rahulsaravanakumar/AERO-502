@@ -16,6 +16,6 @@ class DashboardController < ApplicationController
      def ensure_leader
           return if current_user.leader?
 
-          redirect_to tasks_path, alert: "The project dashboard is available to team officers and the Chief Engineer."
+          redirect_to tasks_path, alert: "Team progress is available to team officers and the Chief Engineer."
      end
 end

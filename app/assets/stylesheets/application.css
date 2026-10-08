@@ -193,21 +193,42 @@ thead th { color: var(--muted); font-size: .78rem; letter-spacing: .06em; text-t
   .site-header { padding-inline: 1rem; }
 }
 
-/* Dashboard filters, lists and member hours chart */
+/* Filters and the Progress page */
 .filter-bar { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end; margin-bottom: 1.5rem; padding: 1.25rem 1.5rem; }
-.filter-bar .field { margin-bottom: 0; min-width: 11rem; }
+.filter-bar .field { margin-bottom: 0; min-width: 11rem; flex: 1 1 11rem; }
 .filter-actions { display: flex; gap: .6rem; }
 .plain-list { margin: 0; padding: 0; list-style: none; }
 .plain-list li { display: flex; flex-direction: column; gap: .2rem; padding: .7rem 0; border-bottom: 1px solid var(--line); }
 .total-row th, .total-row td { font-weight: 800; border-top: 2px solid var(--ink); }
-.bar-chart { margin: 1.5rem 0 0; }
-.bar-chart figcaption { margin-bottom: .75rem; font-weight: 700; }
-.bar-row { display: grid; grid-template-columns: minmax(8rem, 12rem) 1fr; gap: 1rem; align-items: center; margin-bottom: .8rem; }
-.bars { display: grid; gap: .3rem; }
-.bar { display: block; min-width: fit-content; padding: .2rem .5rem; border-radius: 4px; font-size: .82rem; white-space: nowrap; }
-.bar-estimate { background: #e9e1d3; color: var(--ink); }
-.bar-actual { background: var(--maroon); color: white; }
-@media (max-width: 640px) { .bar-row { grid-template-columns: 1fr; gap: .3rem; } }
+.progress-metrics { grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); }
+.metric-alert strong { color: #a22929; }
+.status-overdue { background: #a22929; }
+.progress-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr)); gap: 1.25rem; margin-bottom: 1.25rem; }
+.progress-grid .panel { margin-bottom: 0; }
+.panel h2 + .panel-note, .panel-note { margin: -.4rem 0 1rem; font-size: .92rem; }
+.progress-list { margin: 0; padding: 0; list-style: none; }
+.progress-list li, .progress-list > div { display: flex; flex-direction: column; gap: .15rem; padding: .65rem 0; border-top: 1px solid var(--line); }
+.progress-list dt { font-weight: 700; }
+.progress-list dd { margin: 0; color: var(--muted); }
+.all-clear { margin: 0; padding: .8rem 1rem; border-radius: 8px; background: #e8f3ee; color: var(--green); font-weight: 700; }
+.hours-heading { align-items: flex-end; flex-wrap: wrap; gap: 1rem; }
+.hours-heading h2 { margin-bottom: .5rem; }
+.range-form { display: flex; flex-wrap: wrap; gap: .75rem; align-items: flex-end; }
+.range-form .field { margin-bottom: 0; }
+.range-form input[type="submit"], .filter-actions input[type="submit"] { width: auto; }
+.bar-chart { margin: 1rem 0 1.5rem; }
+.chart-legend { display: flex; gap: 1.25rem; margin-bottom: .9rem; font-size: .88rem; color: var(--muted); }
+.legend-swatch { display: inline-block; width: .85rem; height: .85rem; margin-right: .4rem; border-radius: 3px; vertical-align: -.1rem; }
+.legend-actual { background: var(--maroon); }
+.legend-estimate { background: #e3d9c8; }
+.bar-row { display: grid; grid-template-columns: minmax(7rem, 11rem) 1fr 6.5rem; gap: .9rem; align-items: center; margin-bottom: .55rem; }
+.bar-label { font-weight: 600; }
+.bar-track { position: relative; height: 1.1rem; border-radius: 4px; background: var(--cream); overflow: hidden; }
+.bar-estimate, .bar-actual { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; }
+.bar-estimate { background: #e3d9c8; }
+.bar-actual { top: .25rem; bottom: .25rem; background: var(--maroon); }
+.bar-value { font-variant-numeric: tabular-nums; font-size: .9rem; color: var(--muted); text-align: right; }
+@media (max-width: 640px) { .bar-row { grid-template-columns: 1fr auto; } .bar-track { grid-column: 1 / -1; } }
 
 /* Organization screen */
 .org-teams { display: grid; grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem; align-items: start; }

@@ -1,30 +1,24 @@
-<% content_for :title, "Dashboard · AERO Task Hub" %>
+<% content_for :title, "Team progress · AERO Task Hub" %>
 
 <div class="page-heading">
   <div>
     <p class="eyebrow"><%= current_user.team&.name || "ALL TEAMS" %></p>
-    <h1>Project dashboard</h1>
-    <p class="lede">Current status, ownership, and effort in one meeting-ready view.</p>
+    <h1>Team progress</h1>
+    <p class="lede">Where work stands, what is overdue, and how actual hours compare with the estimates.</p>
   </div>
   <%= link_to "Create task", new_task_path, class: "button" %>
 </div>
 
-<%= form_with url: dashboard_path, method: :get, class: "panel filter-bar", aria: { label: "Dashboard filters" } do |form| %>
+<%= form_with url: dashboard_path, method: :get, class: "panel filter-bar", aria: { label: "Progress filters" } do |form| %>
   <div class="field">
     <%= form.label :project_id, "Project" %>
     <%= form.collection_select :project_id, @projects, :id, :full_name, include_blank: "All projects", selected: @summary.project&.id %>
   </div>
-  <div class="field">
-    <%= form.label :from, "Hours from" %>
-    <%= form.date_field :from, value: @summary.from %>
-  </div>
-  <div class="field">
-    <%= form.label :to, "Hours to" %>
-    <%= form.date_field :to, value: @summary.to %>
-  </div>
   <%= fields :filter do |filter_form| %>
     <%= render "tasks/filter_fields", form: filter_form %>
   <% end %>
+  <%= hidden_field_tag :from, @summary.from, id: nil if @summary.from %>
+  <%= hidden_field_tag :to, @summary.to, id: nil if @summary.to %>
   <div class="filter-actions">
     <%= form.submit "Apply", class: "button", name: nil %>
     <%= link_to "Clear", dashboard_path(filter: { q: "" }), class: "button button-secondary" %>
@@ -37,7 +31,7 @@
   </div>
 <% end %>
 
-<section class="metrics" aria-label="Task status summary">
+<section class="metrics progress-metrics" aria-label="Task summary">
   <% @summary.status_counts.each do |status, count| %>
     <article class="metric" data-status="<%= status %>">
       <span class="status-dot status-<%= status %>" aria-hidden="true"></span>
@@ -47,20 +41,28 @@
       </div>
     </article>
   <% end %>
+  <article class="metric<%= " metric-alert" if @summary.overdue_tasks.any? %>" data-overdue-count>
+    <span class="status-dot status-overdue" aria-hidden="true"></span>
+    <div>
+      <strong><%= @summary.overdue_tasks.size %></strong>
+      <span>Overdue</span>
+    </div>
+  </article>
   <article class="metric metric-emphasis">
     <span aria-hidden="true">Σ</span>
     <div>
       <strong><%= number_with_precision(@summary.total_actual, precision: 1, strip_insignificant_zeros: true) %>h</strong>
-      <span>Actual effort</span>
+      <span>Actual of <%= estimate_label(@summary.total_estimate) %> estimated</span>
     </div>
   </article>
 </section>
 
-<div class="detail-grid">
+<div class="progress-grid">
   <section class="panel" data-overdue>
-    <h2>Overdue tasks</h2>
+    <h2>Needs attention</h2>
+    <p class="muted panel-note">Unfinished tasks past their due date.</p>
     <% if @summary.overdue_tasks.any? %>
-      <ul class="plain-list">
+      <ul class="progress-list">
         <% @summary.overdue_tasks.each do |task| %>
           <li>
             <%= link_to task.title, task %>
@@ -69,14 +71,15 @@
         <% end %>
       </ul>
     <% else %>
-      <p class="muted">No overdue tasks.</p>
+      <p class="all-clear">No overdue tasks.</p>
     <% end %>
   </section>
 
   <section class="panel" data-assignments>
-    <h2>Assignments by member</h2>
+    <h2>Who's working on what</h2>
+    <p class="muted panel-note">Each member's assigned tasks.</p>
     <% if @summary.member_rows.any? %>
-      <dl class="detail-list">
+      <dl class="progress-list assignment-list">
         <% @summary.member_rows.each do |row| %>
           <div>
             <dt><%= row.member.name %></dt>
@@ -91,10 +94,42 @@
 </div>
 
 <section class="panel" data-member-hours>
-  <div class="section-heading">
-    <h2>Member hour summary</h2>
-    <span class="muted"><%= @summary.from || @summary.to ? "#{@summary.from&.to_fs(:long) || "Start"} – #{@summary.to&.to_fs(:long) || "today"}" : "All dates" %></span>
+  <div class="section-heading hours-heading">
+    <div>
+      <h2>Hours by member</h2>
+      <p class="muted panel-note"><%= @summary.from || @summary.to ? "#{@summary.from&.to_fs(:long) || "Start"} – #{@summary.to&.to_fs(:long) || "today"}" : "All dates" %></p>
+    </div>
+    <%= form_with url: dashboard_path, method: :get, class: "range-form", data: { hours_range: true }, aria: { label: "Hours date range" } do |form| %>
+      <%= hidden_field_tag :project_id, @summary.project&.id, id: nil %>
+      <div class="field">
+        <%= form.label :from, "Hours from" %>
+        <%= form.date_field :from, value: @summary.from %>
+      </div>
+      <div class="field">
+        <%= form.label :to, "Hours to" %>
+        <%= form.date_field :to, value: @summary.to %>
+      </div>
+      <%= form.submit "Show hours", class: "button button-secondary", name: nil %>
+    <% end %>
   </div>
+
+  <figure class="bar-chart" data-member-chart aria-hidden="true">
+    <div class="chart-legend">
+      <span><i class="legend-swatch legend-actual"></i>Actual hours</span>
+      <span><i class="legend-swatch legend-estimate"></i>Assigned-task estimate</span>
+    </div>
+    <% @summary.member_rows.each do |row| %>
+      <div class="bar-row" data-member="<%= row.member.name %>" data-actual="<%= row.actual.to_d.to_s("F") %>">
+        <span class="bar-label"><%= row.member.name %></span>
+        <span class="bar-track">
+          <span class="bar-estimate" style="width: <%= (row.estimate / @summary.chart_scale * 100).round(1) %>%"></span>
+          <span class="bar-actual" style="width: <%= (row.actual / @summary.chart_scale * 100).round(1) %>%"></span>
+        </span>
+        <span class="bar-value"><%= number_with_precision(row.actual, precision: 1, strip_insignificant_zeros: true) %> / <%= number_with_precision(row.estimate, precision: 1, strip_insignificant_zeros: true) %>h</span>
+      </div>
+    <% end %>
+  </figure>
+
   <div class="table-wrap">
     <table>
       <thead>
@@ -124,25 +159,12 @@
     </table>
   </div>
   <p class="hint">A shared task's full estimate appears on each assigned member's row; the project total counts each task once.</p>
-
-  <figure class="bar-chart" data-member-chart>
-    <figcaption>Estimated vs. actual hours by member</figcaption>
-    <% @summary.member_rows.each do |row| %>
-      <div class="bar-row" data-member="<%= row.member.name %>" data-actual="<%= row.actual.to_d.to_s("F") %>">
-        <span class="bar-label"><%= row.member.name %></span>
-        <div class="bars">
-          <span class="bar bar-estimate" style="width: <%= (row.estimate / @summary.chart_scale * 100).round(1) %>%"><%= estimate_label(row.estimate) %> estimated</span>
-          <span class="bar bar-actual" style="width: <%= (row.actual / @summary.chart_scale * 100).round(1) %>%"><%= estimate_label(row.actual) %> actual</span>
-        </div>
-      </div>
-    <% end %>
-  </figure>
 </section>
 
 <section class="panel" data-task-overview>
   <div class="section-heading">
-    <h2>Task overview</h2>
-    <%= link_to "Open full board", tasks_path %>
+    <h2>All tasks</h2>
+    <%= link_to "Open the board", tasks_path %>
   </div>
 
   <% if @summary.tasks.any? %>
@@ -152,10 +174,9 @@
           <tr>
             <th scope="col">Task</th>
             <th scope="col">Team</th>
-            <th scope="col">Assigned members</th>
+            <th scope="col">Assigned</th>
             <th scope="col">Status</th>
-            <th scope="col">Estimated</th>
-            <th scope="col">Actual</th>
+            <th scope="col">Hours (actual / estimate)</th>
             <th scope="col">Due</th>
           </tr>
         </thead>
@@ -166,8 +187,7 @@
               <td><%= task.team.name %></td>
               <td><%= task.assignees.map(&:name).to_sentence.presence || "Unassigned" %></td>
               <td><span class="badge status-<%= task.status %>"><%= task.status.humanize %></span></td>
-              <td><%= number_with_precision(task.estimated_hours, precision: 2, strip_insignificant_zeros: true) %>h</td>
-              <td><%= number_with_precision(task.total_actual_hours, precision: 2, strip_insignificant_zeros: true) %>h</td>
+              <td><%= number_with_precision(task.total_actual_hours, precision: 2, strip_insignificant_zeros: true) %>h / <%= number_with_precision(task.estimated_hours, precision: 2, strip_insignificant_zeros: true) %>h</td>
               <td><%= task.due_date.to_fs(:long) %></td>
             </tr>
           <% end %>
@@ -177,7 +197,7 @@
   <% else %>
     <div class="empty-state">
       <h3>No tasks to show</h3>
-      <p>Create the first task for this project.</p>
+      <p>Create a task, or clear the filters.</p>
     </div>
   <% end %>
 </section>

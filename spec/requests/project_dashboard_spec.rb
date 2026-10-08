@@ -103,7 +103,7 @@ RSpec.describe "Project dashboard", type: :request do
           get dashboard_path
 
           expect(response).to redirect_to(tasks_path)
-          expect(flash[:alert]).to eq("The project dashboard is available to team officers and the Chief Engineer.")
+          expect(flash[:alert]).to eq("Team progress is available to team officers and the Chief Engineer.")
      end
 
      it "shows new values after a status or hours change when the leader refreshes" do

@@ -1,7 +1,9 @@
 Rails.application.routes.draw do
      root "tasks#index"
 
-     get "dashboard", to: "dashboard#index"
+     # The leader dashboard is presented as "Progress"; old /dashboard links still work.
+     get "progress", to: "dashboard#index", as: :dashboard
+     get "dashboard", to: redirect { |_params, request| [ "/progress", request.query_string.presence ].compact.join("?") }
 
      get "login", to: "sessions#new"
      post "login", to: "sessions#create"

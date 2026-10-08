@@ -89,7 +89,7 @@ RSpec.describe "Effort and dashboard delivery", type: :request do
           expect(response).to have_http_status(:success)
           row = response.parsed_body.css("tbody tr").find { |item| item.text.include?(task.title) }
           expect(row).to be_present
-          expect(row.css("td").map(&:text).map(&:strip)).to include("8h", "7h")
+          expect(row.css("td").map(&:text).map(&:strip)).to include("7h / 8h")
           expect(response.parsed_body.at_css(".metric-emphasis strong").text).to eq("11h")
           status_metrics = response.parsed_body.css(".metrics .metric:not(.metric-emphasis)")
           expect(status_metrics.map { |metric| metric.css("strong, span:last-child").map(&:text) }).to include(

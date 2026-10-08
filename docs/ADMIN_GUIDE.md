@@ -96,7 +96,7 @@ The Chief Engineer manages every team. Officers add, rename and archive subteams
 1. Confirm tests, RuboCop and Brakeman pass on the intended release commit.
 2. Create a database backup in the organization's Heroku account. This release reorganizes projects under subteams; that database change cannot be undone except by restoring this backup.
 3. Deploy the reviewed commit. The Procfile release phase runs database migrations.
-4. Open `/up`, sign in, and check one task, one status update, the dashboard and the Teams screen.
+4. Open `/up`, sign in, and check one task, one status update, the Progress page and the Teams screen.
 5. Record the commit SHA, time, operator, backup identifier and result.
 
 ## Simulated failed update and rollback

@@ -31,7 +31,7 @@ RSpec.describe "User guide", type: :request do
                "must each be a full web address starting with http:// or https://",
                TasksController::OWN_TEAM_ONLY, "You can update only tasks assigned to you.",
                "You cannot view that task.", "You can change only your own hours.",
-               "The project dashboard is available to team officers and the Chief Engineer.",
+               "Team progress is available to team officers and the Chief Engineer.",
                "Only the Chief Engineer can manage people and roles.",
                "You can manage only your own team's subteams and projects.",
                "Google sign-in was cancelled or failed"

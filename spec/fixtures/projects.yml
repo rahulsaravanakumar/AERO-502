@@ -1,5 +1,11 @@
 aero:
   name: SAE AERO Design
+  subteam: wing
 
 archive:
   name: Archive Project
+  subteam: wing
+
+airframe_build:
+  name: Airframe build
+  subteam: airframe

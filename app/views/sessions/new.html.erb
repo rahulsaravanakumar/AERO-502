@@ -7,20 +7,28 @@
     <p class="lede">A role-aware workspace for task assignments, status updates, and planned-versus-actual effort.</p>
   </div>
 
-  <%= form_with url: login_path, class: "panel login-form" do |form| %>
+  <div class="panel login-form">
     <h2>Sign in</h2>
-    <p class="muted">Use the practice account supplied by your team lead.</p>
+    <%= button_to "/auth/google_oauth2", method: :post, class: "button button-wide google-button", data: { turbo: false } do %>
+      Sign in with Google
+    <% end %>
+    <p class="muted">Use the Google (TAMU) email the Chief Engineer added for you. Trouble signing in? Read the <%= link_to "user guide", help_path %>.</p>
 
-    <div class="field">
-      <%= form.label :email, "Email address" %>
-      <%= form.email_field :email, required: true, autofocus: true, autocomplete: "email" %>
-    </div>
+    <% if Rails.configuration.x.password_sign_in %>
+      <p class="divider"><span>or use a practice account</span></p>
+      <%= form_with url: login_path do |form| %>
+        <div class="field">
+          <%= form.label :email, "Email address" %>
+          <%= form.email_field :email, required: true, autocomplete: "email" %>
+        </div>
 
-    <div class="field">
-      <%= form.label :password %>
-      <%= form.password_field :password, required: true, autocomplete: "current-password" %>
-    </div>
+        <div class="field">
+          <%= form.label :password %>
+          <%= form.password_field :password, required: true, autocomplete: "current-password" %>
+        </div>
 
-    <%= form.submit "Sign in", class: "button button-wide" %>
-  <% end %>
+        <%= form.submit "Sign in", class: "button button-wide" %>
+      <% end %>
+    <% end %>
+  </div>
 </section>

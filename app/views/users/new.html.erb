@@ -1,0 +1,37 @@
+<% content_for :title, "Add a person · AERO Task Hub" %>
+
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">ADMINISTRATION</p>
+    <h1>Add a person</h1>
+    <p class="lede">Enter the person's Google (TAMU) email. They can sign in with Google right away — no password needed.</p>
+  </div>
+</div>
+
+<%= form_with model: @user, class: "panel task-form" do |form| %>
+  <% if @user.errors.any? %>
+    <div class="error-summary" role="alert">
+      <h2><%= pluralize(@user.errors.count, "error") %> prevented this person from being added</h2>
+    </div>
+  <% end %>
+
+  <div class="form-grid">
+    <div class="field">
+      <%= form.label :name %>
+      <%= form.text_field :name, required: true, **field_error_attributes(@user, :name) %>
+      <%= field_error(@user, :name) %>
+    </div>
+    <div class="field">
+      <%= form.label :email, "Google email" %>
+      <%= form.email_field :email, required: true, placeholder: "name@tamu.edu", **field_error_attributes(@user, :email) %>
+      <%= field_error(@user, :email) %>
+    </div>
+  </div>
+
+  <%= render "role_fields", form: form, user: @user %>
+
+  <div class="form-actions">
+    <%= form.submit "Add person", class: "button" %>
+    <%= link_to "Cancel", users_path, class: "button button-secondary" %>
+  </div>
+<% end %>

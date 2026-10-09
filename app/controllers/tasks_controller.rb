@@ -1,4 +1,8 @@
 class TasksController < ApplicationController
+     include TaskFiltering
+
+     OWN_TEAM_ONLY = "You can manage only tasks on your own team.".freeze
+
      before_action :require_sign_in
      before_action :set_task, only: %i[show edit update destroy]
      before_action :ensure_can_view_task, only: :show
@@ -6,14 +10,18 @@ class TasksController < ApplicationController
      before_action :ensure_can_manage_task, only: %i[edit destroy]
 
      def index
-          @tasks = Task.accessible_to(current_user)
-                       .includes(:project, :team, :assignees, :time_entries)
-                       .order(:status, :due_date, :title)
+          @tasks = task_filter.apply(Task.accessible_to(current_user))
+                              .includes(:project, :team, :assignees, time_entries: :user)
+                              .order(:status, :due_date, :title)
           @view = params[:view] == "mine" ? "mine" : "board"
           if @view == "mine"
                @tasks = @tasks.joins(:task_assignments)
                               .where(task_assignments: { user_id: current_user.id })
           end
+          # Leaders see member hours for the tasks on the board (scope S07, KAN-29).
+          return unless @view == "board" && current_user.leader?
+
+          @hours = HourSummary.new(tasks: @tasks.to_a, from: params[:from], to: params[:to])
      end
 
      def show
@@ -26,7 +34,7 @@ class TasksController < ApplicationController
      end
 
      def create
-          @task = Task.new(task_params.except(:assignee_ids))
+          @task = Task.new(task_params.except(:assignee_ids, :status))
           @task.creator = current_user
           restrict_task_to_officer_team
 
@@ -46,6 +54,7 @@ class TasksController < ApplicationController
           return update_status_as_member unless current_user.can_manage?(@task)
 
           @task.assign_attributes(task_params.except(:assignee_ids))
+          @task.acting_user = current_user
           restrict_task_to_officer_team
 
           if save_task_with_assignments
@@ -78,14 +87,16 @@ class TasksController < ApplicationController
      end
 
      def ensure_can_manage_task
-          deny_access unless current_user.can_manage?(@task)
+          deny_access(OWN_TEAM_ONLY) unless current_user.can_manage?(@task)
      end
 
      def update_status_as_member
+          return deny_access(OWN_TEAM_ONLY) if current_user.leader?
           unless current_user.can_work_on?(@task)
                return deny_access("You can update only tasks assigned to you.")
           end
 
+          @task.acting_user = current_user
           if @task.update(params.require(:task).permit(:status))
                redirect_to @task, notice: "Task status was updated."
           else
@@ -96,21 +107,24 @@ class TasksController < ApplicationController
 
      def task_params
           params.require(:task).permit(
-               :title, :description, :instructions, :link_url, :due_date,
-               :estimated_hours, :status, :project_id, :team_id, :subteam_id,
+               :title, :description, :instructions, :reference_links_text, :start_date, :due_date,
+               :estimated_hours, :status, :project_id,
                assignee_ids: []
           )
      end
 
      def restrict_task_to_officer_team
-          @task.team = current_user.team if current_user.officer?
+          @task.allowed_team_id = current_user.team_id if current_user.officer?
      end
 
+     # Assignees change only when the form submits them (it always sends the field).
      def save_task_with_assignments
-          assignee_ids = Array(task_params[:assignee_ids]).reject(&:blank?).uniq
           Task.transaction do
                @task.save!
-               @task.assignee_ids = assignee_ids
+               if task_params.key?(:assignee_ids)
+                    assignee_ids = Array(task_params[:assignee_ids]).reject(&:blank?).uniq
+                    @task.assign_members(assignee_ids, actor: current_user)
+               end
           end
           true
      rescue ActiveRecord::RecordInvalid => error
@@ -118,11 +132,13 @@ class TasksController < ApplicationController
           false
      end
 
+     # Everyday lists show active groups, plus the task's current ones when editing.
      def prepare_form
-          @projects = Project.order(:name)
-          @teams = current_user.chief_engineer? ? Team.order(:name) : Team.where(id: current_user.team_id)
-          team_ids = @teams.select(:id)
-          @subteams = Subteam.where(team_id: team_ids).order(:name)
+          team_ids = current_user.chief_engineer? ? Team.select(:id) : [ current_user.team_id ]
+          active = Project.active.joins(subteam: :team).merge(Subteam.active).merge(Team.active)
+                          .where(subteams: { team_id: team_ids })
+          current = Project.where(id: @task.project_id)
+          @projects = (active.includes(subteam: :team).to_a | current.includes(subteam: :team).to_a).sort_by(&:full_name)
           @assignees = User.member.where(team_id: team_ids).order(:name)
      end
 end

@@ -10,13 +10,11 @@ RSpec.describe "Delivered task card stories", type: :request do
                title: "Inspect new wing bracket",
                description: "Upload the signed inspection sheet.",
                instructions: "Use revision C and photograph both faces.",
-               link_url: "https://example.com/bracket-plan",
+               reference_links_text: "https://example.com/bracket-plan",
+               start_date: "2026-10-05",
                due_date: "2026-10-12",
                estimated_hours: "6.25",
-               status: "in_progress",
                project_id: projects(:aero).id,
-               team_id: teams(:aerodynamics).id,
-               subteam_id: subteams(:wing).id,
                assignee_ids: [ users(:member).id ]
           }.merge(overrides)
      end
@@ -34,16 +32,17 @@ RSpec.describe "Delivered task card stories", type: :request do
                title: "Inspect new wing bracket",
                description: "Upload the signed inspection sheet.",
                instructions: "Use revision C and photograph both faces.",
-               link_url: "https://example.com/bracket-plan",
+               start_date: Date.new(2026, 10, 5),
                due_date: Date.new(2026, 10, 12),
                estimated_hours: 6.25,
-               status: "in_progress",
+               status: "backlog",
                project_id: projects(:aero).id,
                team_id: teams(:aerodynamics).id,
                subteam_id: subteams(:wing).id,
                creator_id: users(:officer).id
           )
           expect(task.assignee_ids).to eq([ users(:member).id ])
+          expect(task.links.map(&:url)).to eq([ "https://example.com/bracket-plan" ])
 
           get task_path(task)
           expect(response).to have_http_status(:ok)
@@ -57,13 +56,11 @@ RSpec.describe "Delivered task card stories", type: :request do
           expect(form.at_css('input[name="task[title]"]')["value"]).to eq("Inspect new wing bracket")
           expect(form.at_css('textarea[name="task[description]"]').text).to eq("Upload the signed inspection sheet.")
           expect(form.at_css('textarea[name="task[instructions]"]').text).to eq("Use revision C and photograph both faces.")
-          expect(form.at_css('input[name="task[link_url]"]')["value"]).to eq("https://example.com/bracket-plan")
+          expect(form.at_css('textarea[name="task[reference_links_text]"]').text.strip).to eq("https://example.com/bracket-plan")
           expect(form.at_css('input[name="task[due_date]"]')["value"]).to eq("2026-10-12")
           expect(form.at_css('input[name="task[estimated_hours]"]')["value"]).to eq("6.25")
-          expect(form.at_css('select[name="task[status]"] option[selected]')["value"]).to eq("in_progress")
+          expect(form.at_css('select[name="task[status]"] option[selected]')["value"]).to eq("backlog")
           expect(form.at_css('select[name="task[project_id]"] option[selected]')["value"]).to eq(projects(:aero).id.to_s)
-          expect(form.at_css('select[name="task[team_id]"] option[selected]')["value"]).to eq(teams(:aerodynamics).id.to_s)
-          expect(form.at_css('select[name="task[subteam_id]"] option[selected]')["value"]).to eq(subteams(:wing).id.to_s)
      end
 
      it "saves an edited estimate and rejects negative and nonnumeric estimates" do
@@ -115,7 +112,7 @@ RSpec.describe "Delivered task card stories", type: :request do
           expect(task.reload.assignee_ids).to eq([ second_member.id ])
           expect(task.task_assignments.count).to eq(1)
           get task_path(task)
-          expect(response.body).to include("Taylor Member")
-          expect(response.body).not_to include("Morgan Member")
+          assigned = response.parsed_body.css(".detail-list div").find { |row| row.at_css("dt").text == "Assigned members" }
+          expect(assigned.at_css("dd").text).to eq("Taylor Member")
      end
 end

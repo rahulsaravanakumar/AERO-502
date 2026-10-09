@@ -23,6 +23,8 @@ Pricing changes over time. Capture the active plan and recurring cost from the o
 - PostgreSQL through `DATABASE_URL`
 - `RAILS_MASTER_KEY`
 - Optional `DEMO_PASSWORD`
+- `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` for Google sign-in (see `ADMIN_GUIDE.md`)
+- Optional `PASSWORD_SIGN_IN=off` once everyone signs in with Google
 
 ## Data decision
 

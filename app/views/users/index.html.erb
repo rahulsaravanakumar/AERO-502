@@ -1,0 +1,48 @@
+<% content_for :title, "People · AERO Task Hub" %>
+
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">ADMINISTRATION</p>
+    <h1>People and roles</h1>
+    <p class="lede">Only people listed here can sign in. Change a person's role or team; new permissions apply the next time they load a page.</p>
+  </div>
+  <%= link_to "Add person", new_user_path, class: "button" %>
+</div>
+
+<section class="panel">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Name</th>
+          <th scope="col">Email</th>
+          <th scope="col">Role</th>
+          <th scope="col">Team</th>
+          <th scope="col">Access</th>
+          <th scope="col"><span class="visually-hidden">Actions</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @users.each do |user| %>
+          <tr>
+            <th scope="row"><%= user.name %></th>
+            <td><%= user.email %></td>
+            <td><%= user.role_label %></td>
+            <td><%= user.team&.name || "All teams" %><%= " · #{user.subteam.name}" if user.subteam %></td>
+            <td><%= user.access_revoked? ? "Access removed" : "Can sign in" %></td>
+            <td>
+              <div class="row-actions">
+                <%= link_to "Change role", edit_user_path(user), aria: { label: "Change role for #{user.name}" } %>
+                <% if user.access_revoked? %>
+                  <%= button_to "Restore access", restore_user_path(user), method: :patch, class: "link-button", aria: { label: "Restore access for #{user.name}" } %>
+                <% else %>
+                  <%= button_to "Remove access", revoke_user_path(user), method: :patch, class: "link-button", aria: { label: "Remove access for #{user.name}" } %>
+                <% end %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</section>

@@ -6,7 +6,7 @@ class ApplicationController < ActionController::Base
      private
 
      def current_user
-          @current_user ||= User.find_by(id: session[:user_id])
+          @current_user ||= User.find_by(id: session[:user_id], access_revoked_at: nil)
      end
 
      def signed_in?
@@ -16,6 +16,10 @@ class ApplicationController < ActionController::Base
      def require_sign_in
           return if signed_in?
 
+          if session[:user_id]
+               reset_session
+               return redirect_to login_path, alert: "Access not authorized. Your access has been removed."
+          end
           redirect_to login_path, alert: "Please sign in to view that page."
      end
 

@@ -1,0 +1,31 @@
+<% content_for :title, "Edit hours · AERO Task Hub" %>
+
+<div class="page-heading">
+  <div>
+    <p class="eyebrow"><%= @time_entry.task.title %></p>
+    <h1>Correct hours</h1>
+  </div>
+</div>
+
+<%= form_with model: @time_entry, class: "panel task-form" do |form| %>
+  <div class="form-grid">
+    <div class="field">
+      <%= form.label :hours %>
+      <%= form.number_field :hours, min: 0.01, max: TimeEntry::MAX_HOURS_PER_DAY, step: 0.01, required: true, **field_error_attributes(@time_entry, :hours) %>
+      <%= field_error(@time_entry, :hours) %>
+    </div>
+    <div class="field">
+      <%= form.label :worked_on, "Date worked" %>
+      <%= form.date_field :worked_on, required: true, **field_error_attributes(@time_entry, :worked_on) %>
+      <%= field_error(@time_entry, :worked_on) %>
+    </div>
+  </div>
+  <div class="field">
+    <%= form.label :note, "Note (optional)" %>
+    <%= form.text_field :note %>
+  </div>
+  <div class="form-actions">
+    <%= form.submit "Save hours", class: "button" %>
+    <%= link_to "Cancel", task_path(@time_entry.task), class: "button button-secondary" %>
+  </div>
+<% end %>

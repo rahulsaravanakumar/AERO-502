@@ -1,6 +1,19 @@
-# Sprint 1 training checklist
+# Training checklist
 
-Record the training meeting with all required faces visible and keep real credentials out of the recording.
+Record the training meeting with all required faces visible and keep real credentials out of the recording. Trainees follow the user guide (**Help** in the website header, or `docs/USER_GUIDE.md`).
+
+## Practice accounts
+
+The team supplies the practice password separately; never write it in training notes.
+
+| Role | Email |
+| --- | --- |
+| Chief Engineer | chief@example.test |
+| Regular Class officer | officer.a@example.test |
+| Micro Class officer | officer.b@example.test |
+| Regular Class member (Aerodynamics) | member.a@example.test |
+| Regular Class member (Structures) | member.b@example.test |
+| Micro Class member (Structures) | member.c@example.test |
 
 ## Member teach-back
 

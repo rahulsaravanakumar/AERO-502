@@ -15,6 +15,18 @@
     "DEMO_PASSWORD": {
       "description": "Practice account password shared separately with authorized testers.",
       "required": true
+    },
+    "GOOGLE_CLIENT_ID": {
+      "description": "Google sign-in client ID from the organization's Google Cloud project (see docs/ADMIN_GUIDE.md).",
+      "required": false
+    },
+    "GOOGLE_CLIENT_SECRET": {
+      "description": "Google sign-in client secret from the same project. Configure securely; never commit it.",
+      "required": false
+    },
+    "PASSWORD_SIGN_IN": {
+      "description": "Set to off once everyone signs in with Google.",
+      "required": false
     }
   },
   "scripts": {

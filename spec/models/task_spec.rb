@@ -1,11 +1,12 @@
 require "rails_helper"
 
 RSpec.describe Task, type: :model do
-     it "rejects subteams from another team" do
+     it "takes its subteam and team from its project, whatever else was set" do
           task = tasks(:wing_test)
-          task.subteam = subteams(:airframe)
-          expect(task).not_to be_valid
-          expect(task.errors[:subteam]).to include("must belong to the selected team")
+          task.assign_attributes(subteam: subteams(:airframe), team: teams(:structures))
+
+          expect(task).to be_valid
+          expect([ task.subteam, task.team ]).to eq([ subteams(:wing), teams(:aerodynamics) ])
      end
 
      it "calculates member hours consistently with preloaded entries" do
@@ -38,11 +39,39 @@ RSpec.describe Task, type: :model do
           expect(task.variance_hours).to eq(-7.5)
      end
 
-     it "requires a valid supporting link when present" do
+     it "accepts only full http and https web addresses as reference links" do
           task = tasks(:wing_test)
-          task.link_url = "not a link"
 
-          expect(task.valid?).to be_falsey
-          expect(task.errors[:link_url]).to include("must start with http:// or https://")
+          [ "not a link", "ftp://example.com/file", "https://", "example.com/page" ].each do |url|
+               task.reference_links_text = url
+               expect(task).not_to be_valid, "#{url} should be rejected"
+               expect(task.errors[:reference_links_text]).to include(Task::LINK_FORMAT_MESSAGE)
+          end
+
+          task.reference_links_text = " http://example.com/a \r\n\r\nhttps://example.com/b "
+          expect(task).to be_valid
+          expect(task.reference_links_text).to eq("http://example.com/a\nhttps://example.com/b")
+     end
+
+     it "lists saved links in order and keeps them when other fields change" do
+          task = tasks(:wing_test)
+
+          expect(task.reference_links_text).to eq("https://example.com/wing")
+          task.update!(title: "Renamed wing test")
+          expect(task.reload.links.map(&:url)).to eq([ "https://example.com/wing" ])
+     end
+
+     it "defaults the start date to today and requires a due date on or after it" do
+          task = Task.new
+          expect(task.start_date).to eq(Date.current)
+
+          task.due_date = Date.current - 1
+          task.valid?
+          expect(task.errors[:due_date]).to include("must be on or after the start date")
+
+          task.start_date = nil
+          task.valid?
+          expect(task.errors[:start_date]).to include("can't be blank")
+          expect(task.errors[:due_date]).not_to include("must be on or after the start date")
      end
 end

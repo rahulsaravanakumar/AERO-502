@@ -67,7 +67,7 @@ RSpec.describe "Sprint 1 workflow", type: :request do
                          title: "Control surface check",
                          description: "Deliver a checked control-surface worksheet.",
                          instructions: "Use drawing revision B.",
-                         link_url: "https://example.com/control",
+                         reference_links_text: "https://example.com/control",
                          due_date: 1.week.from_now.to_date,
                          estimated_hours: 3.5,
                          status: "backlog",

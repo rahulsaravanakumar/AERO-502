@@ -66,7 +66,7 @@ RSpec.describe "Effort and dashboard delivery", type: :request do
           expect(task.reload.total_actual_hours).to eq(2.5)
      end
 
-     it "shows 4 plus 3 hours once on the detail, board, and chief dashboard" do
+     it "shows 4 plus 3 hours once on the detail page and the chief's board summary" do
           task, first_member, second_member = shared_task_with_hours
           sign_in(users(:chief))
 
@@ -85,45 +85,32 @@ RSpec.describe "Effort and dashboard delivery", type: :request do
           expect(card).to be_present
           expect(card.at_css(".task-foot strong").text).to eq("7/8h")
 
-          get root_path
-          expect(response).to have_http_status(:success)
-          row = response.parsed_body.css("tbody tr").find { |item| item.text.include?(task.title) }
-          expect(row).to be_present
-          expect(row.css("td").map(&:text).map(&:strip)).to include("8h", "7h")
-          expect(response.parsed_body.at_css(".metric-emphasis strong").text).to eq("11h")
-          status_metrics = response.parsed_body.css(".metrics .metric:not(.metric-emphasis)")
-          expect(status_metrics.map { |metric| metric.css("strong, span:last-child").map(&:text) }).to include(
-               [ "2", "Backlog" ], [ "1", "In progress" ], [ "0", "Completed" ]
-          )
-          workload = response.parsed_body.css(".member-grid article").map { |item| item.text.squish }
-          expect(workload).to include("#{first_member.name} 6.5 hours", "#{second_member.name} 3 hours")
+          expect(response.parsed_body.at_css("[data-board-summary]").text.squish).to include("11h actual")
+          counts = response.parsed_body.css(".column-heading").map { |heading| heading.css("h2, span").map(&:text) }
+          expect(counts).to eq([ [ "Backlog", "2" ], [ "In progress", "1" ], [ "Completed", "0" ] ])
+          workload = response.parsed_body.css("[data-member-hours] tbody tr").map { |item| item.text.squish }
+          expect(workload).to include(a_string_starting_with("#{first_member.name} 18 hours 6.5 hours"),
+                                      a_string_starting_with("#{second_member.name} 8 hours 3 hours"))
      end
 
-     it "shows an assigned shared task once in the member dashboard totals" do
+     it "shows an assigned shared task once on the member's board and keeps hours for leaders" do
           task, first_member, = shared_task_with_hours
           sign_in(first_member)
 
           get root_path
           expect(response).to have_http_status(:success)
-          expect(response.body).to include("Your assignments")
-          expect(response.parsed_body.css("tbody tr").count).to eq(2)
-          expect(response.parsed_body.css("tbody tr").count { |row| row.text.include?(task.title) }).to eq(1)
-          expect(response.parsed_body.at_css(".metric-emphasis strong").text).to eq("9.5h")
+          expect(response.parsed_body.css(".task-card").count).to eq(2)
+          expect(response.parsed_body.css(".task-card").count { |card| card.text.include?(task.title) }).to eq(1)
           expect(response.body).not_to include(tasks(:spar_check).title)
-          expect(response.body).not_to include("Member workload")
+          expect(response.parsed_body.at_css("[data-member-hours]")).to be_nil
      end
 
-     it "explains an empty assignment list on the member dashboard and board" do
+     it "explains an empty assignment list on the member board" do
           member = User.create!(
                name: "Unassigned Member", email: "unassigned@example.test",
                password: "password", role: :member, team: teams(:aerodynamics)
           )
           sign_in(member)
-
-          get root_path
-          expect(response).to have_http_status(:success)
-          expect(response.body).to include("No tasks to show", "No work has been assigned to you yet.")
-          expect(response.parsed_body.at_css(".metric-emphasis strong").text).to eq("0h")
 
           get tasks_path
           expect(response).to have_http_status(:success)
@@ -144,7 +131,7 @@ RSpec.describe "Effort and dashboard delivery", type: :request do
           )
           task = Task.create!(
                title: "Shared effort check", description: "Measure shared effort.",
-               estimated_hours: 8, status: :backlog, project: projects(:aero),
+               estimated_hours: 8, due_date: Date.new(2026, 10, 20), status: :backlog, project: projects(:aero),
                team: teams(:aerodynamics), creator: users(:officer)
           )
           [ first_member, second_member ].each do |member|

@@ -1,0 +1,6 @@
+<% content_for :title, "User guide · AERO Task Hub" %>
+
+<article class="panel guide">
+  <%= sanitize @guide_html, tags: %w[h1 h2 h3 p ul ol li strong em code pre a table thead tbody tr th td blockquote],
+                            attributes: %w[href id] %>
+</article>

@@ -12,50 +12,56 @@
 
   <div class="field">
     <%= form.label :title %>
-    <%= form.text_field :title, required: true %>
+    <%= form.text_field :title, required: true, **field_error_attributes(task, :title) %>
+    <%= field_error(task, :title) %>
   </div>
 
   <div class="form-grid">
     <div class="field">
       <%= form.label :project_id, "Project" %>
-      <%= form.collection_select :project_id, @projects, :id, :name, { prompt: "Select a project" }, required: true %>
+      <%= form.collection_select :project_id, @projects, :id, :full_name, { prompt: "Select a project" }, required: true, **field_error_attributes(task, :project) %>
+      <p class="hint">Listed as team · subteam · project. The task's team and subteam come from its project.</p>
+      <%= field_error(task, :project) %>
     </div>
-    <div class="field">
-      <%= form.label :team_id, "Team" %>
-      <%= form.collection_select :team_id, @teams, :id, :name, { prompt: "Select a team" }, required: true %>
-    </div>
-    <div class="field">
-      <%= form.label :subteam_id, "Subteam (optional)" %>
-      <%= form.collection_select :subteam_id, @subteams, :id, :name, { include_blank: "No subteam" } %>
-    </div>
-    <div class="field">
-      <%= form.label :status %>
-      <%= form.select :status, Task.statuses.keys.map { |status| [status.humanize, status] } %>
-    </div>
+    <% if task.persisted? %>
+      <div class="field">
+        <%= form.label :status %>
+        <%= form.select :status, Task.statuses.keys.map { |status| [status.humanize, status] } %>
+      </div>
+    <% end %>
   </div>
 
   <div class="field">
-    <%= form.label :description, "Expected deliverables" %>
-    <%= form.text_area :description, rows: 4, required: true %>
+    <%= form.label :description, "Expected deliverables (optional)" %>
+    <%= form.text_area :description, rows: 4 %>
   </div>
 
   <div class="field">
-    <%= form.label :instructions, "Work instructions" %>
+    <%= form.label :instructions, "Work instructions (optional)" %>
     <%= form.text_area :instructions, rows: 5 %>
+  </div>
+
+  <div class="field">
+    <%= form.label :reference_links_text, "Reference links (optional, one per line)" %>
+    <%= form.text_area :reference_links_text, rows: 3, placeholder: "https://…", **field_error_attributes(task, :reference_links_text) %>
+    <%= field_error(task, :reference_links_text) %>
   </div>
 
   <div class="form-grid">
     <div class="field">
-      <%= form.label :link_url, "Supporting link" %>
-      <%= form.url_field :link_url, placeholder: "https://…" %>
+      <%= form.label :start_date %>
+      <%= form.date_field :start_date, required: true, **field_error_attributes(task, :start_date) %>
+      <%= field_error(task, :start_date) %>
     </div>
     <div class="field">
       <%= form.label :due_date %>
-      <%= form.date_field :due_date %>
+      <%= form.date_field :due_date, required: true, **field_error_attributes(task, :due_date) %>
+      <%= field_error(task, :due_date) %>
     </div>
     <div class="field">
       <%= form.label :estimated_hours %>
-      <%= form.number_field :estimated_hours, min: 0, step: 0.25, required: true %>
+      <%= form.number_field :estimated_hours, min: 0, step: 0.25, required: true, **field_error_attributes(task, :estimated_hours) %>
+      <%= field_error(task, :estimated_hours) %>
     </div>
   </div>
 

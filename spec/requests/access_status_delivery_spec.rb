@@ -11,6 +11,7 @@ RSpec.describe "KAN-7, KAN-9, and KAN-12 delivered access and status", type: :re
                title: "Unassigned wind tunnel calibration",
                description: "Calibrate the tunnel before testing.",
                estimated_hours: 2,
+               due_date: Date.new(2026, 10, 20),
                status: :backlog,
                project: projects(:aero),
                team: teams(:aerodynamics),
@@ -46,8 +47,8 @@ RSpec.describe "KAN-7, KAN-9, and KAN-12 delivered access and status", type: :re
                expect(response).to have_http_status(:ok)
           end
 
-          get root_path
-          expect(response.body).to include("Wing load test", "Verify spar dimensions", "Create task")
+          get tasks_path
+          expect(response.body).to include("Wing load test", "Verify spar dimensions", "New Task")
      end
 
      it "shows officers only their team and denies cross-team management" do
@@ -118,12 +119,6 @@ RSpec.describe "KAN-7, KAN-9, and KAN-12 delivered access and status", type: :re
                end
                expect(column).not_to be_nil
                expect(column.text).to include(task.title)
-
-               get root_path
-               expect(response).to have_http_status(:ok)
-               row = Nokogiri::HTML(response.body).css("tbody tr").find { |entry| entry.text.include?(task.title) }
-               expect(row.at_css(".badge")["class"]).to include("status-#{status}")
-               expect(row.text).to include(label)
           end
      end
 

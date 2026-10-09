@@ -1,0 +1,34 @@
+<% content_for :title, "#{@record.persisted? ? "Rename" : "New"} #{record_label.downcase} · AERO Task Hub" %>
+
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">ADMINISTRATION</p>
+    <h1><%= @record.persisted? ? "Rename #{record_label.downcase}" : "New #{record_label.downcase}" %></h1>
+  </div>
+</div>
+
+<%= form_with model: @record, class: "panel task-form" do |form| %>
+  <% if parent_field %>
+    <% parent = parent_field.to_s.delete_suffix("_id").to_sym %>
+    <% if @record.persisted? %>
+      <p class="hint">In <%= @record.public_send(parent).full_name %>. A <%= record_label.downcase %> stays in the <%= parent %> it was created in.</p>
+    <% else %>
+      <div class="field">
+        <%= form.label parent_field, parent.to_s.humanize %>
+        <%= form.collection_select parent_field, parent_options, :id, :full_name, { prompt: "Select a #{parent}" }, required: true, **field_error_attributes(@record, parent) %>
+        <%= field_error(@record, parent) %>
+      </div>
+    <% end %>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :name %>
+    <%= form.text_field :name, required: true, **field_error_attributes(@record, :name) %>
+    <%= field_error(@record, :name) %>
+  </div>
+
+  <div class="form-actions">
+    <%= form.submit "Save #{record_label.downcase}", class: "button" %>
+    <%= link_to "Cancel", organization_path, class: "button button-secondary" %>
+  </div>
+<% end %>

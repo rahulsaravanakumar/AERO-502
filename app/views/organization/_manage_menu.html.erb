@@ -1,0 +1,8 @@
+<%# Rename/Archive for one record, folded into a keyboard-accessible disclosure. %>
+<details class="manage-menu">
+  <summary>Manage<span class="visually-hidden"> <%= label %></span></summary>
+  <div class="manage-items">
+    <%= link_to "Rename", edit_path, aria: { label: "Rename #{label}" } %>
+    <%= button_to "Archive", archive_path, method: :patch, class: "link-button", aria: { label: "Archive #{label}" } %>
+  </div>
+</details>

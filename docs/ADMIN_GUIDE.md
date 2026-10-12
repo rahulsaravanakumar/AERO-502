@@ -52,7 +52,7 @@ Only people listed under **People** can sign in. Only the Chief Engineer can ope
 4. To remove a person's access, select **Remove access** next to their name. They are signed out at their next page load and cannot sign in; their tasks and hours are kept.
 5. To let them back in, select **Restore access**.
 
-Keep at least one active Chief Engineer at all times, and do not remove your own access.
+The website blocks changing the last active Chief Engineer to another role or removing their access, including direct requests. A Chief Engineer whose access has already been removed does not count as an active administrator. Add another active Chief Engineer before removing the outgoing chief's role or access.
 
 ### Semester handover
 

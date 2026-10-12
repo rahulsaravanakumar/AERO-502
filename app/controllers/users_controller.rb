@@ -36,8 +36,11 @@ class UsersController < ApplicationController
      end
 
      def revoke
-          @user.update!(access_revoked_at: Time.current)
-          redirect_to users_path, notice: "#{@user.name} can no longer sign in. Their tasks and hours are kept."
+          if @user.update(access_revoked_at: Time.current)
+               redirect_to users_path, notice: "#{@user.name} can no longer sign in. Their tasks and hours are kept."
+          else
+               redirect_to users_path, alert: @user.errors.full_messages.to_sentence
+          end
      end
 
      def restore

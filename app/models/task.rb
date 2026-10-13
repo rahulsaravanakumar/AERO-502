@@ -9,10 +9,10 @@ class Task < ApplicationRecord
 
      has_many :task_assignments, dependent: :destroy
      has_many :assignees, through: :task_assignments, source: :user
-     has_many :time_entries, dependent: :destroy
+     has_many :time_entries, dependent: :restrict_with_error
      has_many :links, -> { order(:position, :id) }, class_name: "TaskLink", dependent: :destroy,
                                                     inverse_of: :task
-     has_many :events, class_name: "TaskEvent", dependent: :delete_all
+     has_many :events, class_name: "TaskEvent", dependent: :restrict_with_error
 
      enum :status, { backlog: 0, in_progress: 1, completed: 2 }, validate: true
 

@@ -89,4 +89,28 @@ RSpec.describe "Task history", type: :request do
           expect { event.destroy! }.to raise_error(ActiveRecord::ReadOnlyRecord)
           expect(Rails.application.routes.named_routes.names.grep(/event/)).to be_empty
      end
+
+     it "keeps recorded history when a leader tries to delete its task" do
+          event = TaskEvent.create!(task: task, actor: users(:member), action: "status_changed",
+                                    from_status: "backlog", to_status: "in_progress")
+          sign_in(users(:chief))
+
+          expect { delete task_path(task) }.not_to change(TaskEvent, :count)
+          expect(response).to redirect_to(task_path(task))
+          expect(flash[:alert]).to include("cannot be deleted")
+          expect(task.reload).to be_persisted
+          expect(event.reload).to be_persisted
+          expect { task.destroy! }.to raise_error(ActiveRecord::RecordNotDestroyed)
+     end
+
+     it "keeps logged hours when a task has no event history" do
+          sign_in(users(:chief))
+          task = tasks(:spar_check)
+          expect(task.events).to be_empty
+
+          expect { delete task_path(task) }.not_to change(TimeEntry, :count)
+          expect(response).to redirect_to(task_path(task))
+          expect(task.reload).to be_persisted
+          expect(time_entries(:spar_hours).reload).to be_persisted
+     end
 end

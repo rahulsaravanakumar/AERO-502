@@ -17,6 +17,7 @@ class User < ApplicationRecord
                             "chief_engineer" => "a Chief Engineer" }.freeze
 
      before_validation :normalize_email
+     before_update :preserve_last_active_chief_engineer
 
      validates :name, presence: true
      validates :email, presence: true, uniqueness: { case_sensitive: false },
@@ -54,6 +55,20 @@ class User < ApplicationRecord
      end
 
      private
+
+     def preserve_last_active_chief_engineer
+          return unless role_in_database == "chief_engineer" && access_revoked_at_in_database.nil?
+          return if chief_engineer? && !access_revoked?
+
+          # Serialize administrator removals across requests. This PostgreSQL lock
+          # lasts until the save transaction commits or rolls back, so two chiefs
+          # cannot simultaneously remove the organization's last administrators.
+          self.class.connection.execute("SELECT pg_advisory_xact_lock(260026)")
+          return if self.class.chief_engineer.where(access_revoked_at: nil).where.not(id: id).exists?
+
+          errors.add(:base, "At least one active Chief Engineer is required. Add another Chief Engineer before removing this role or access.")
+          throw :abort
+     end
 
      def subteam_belongs_to_team
           return if subteam.blank? || subteam.team_id == team_id

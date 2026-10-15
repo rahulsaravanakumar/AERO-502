@@ -1,5 +1,10 @@
 # See https://git-scm.com/docs/gitattributes for more about git attribute files.
 
+# Check out text files with LF endings on every OS. Windows clones with
+# core.autocrlf=true otherwise get CRLF, which breaks bin/* scripts and the
+# docs specs when run under WSL or Linux. Git still detects binary files.
+* text=auto eol=lf
+
 # Mark the database schema as having been generated.
 db/schema.rb linguist-generated
 

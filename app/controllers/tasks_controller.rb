@@ -66,8 +66,11 @@ class TasksController < ApplicationController
      end
 
      def destroy
-          @task.destroy!
-          redirect_to tasks_path, notice: "Task was deleted."
+          if @task.destroy
+               redirect_to tasks_path, notice: "Task was deleted."
+          else
+               redirect_to @task, alert: "Tasks with recorded history or logged hours cannot be deleted."
+          end
      end
 
      private

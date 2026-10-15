@@ -33,14 +33,15 @@ Set these as Heroku Config Vars (Heroku dashboard → app → Settings → Revea
 
 ## Set up Google sign-in
 
-Do this once, signed in to the organization's Google account.
+Do this once, signed in to the organization's Google account. The current project is `aero-502` in the Google Cloud Console; give at least one organization officer the Owner role under IAM & Admin → IAM so it can be managed after the student developers leave.
 
 1. Open the Google Cloud Console and create (or choose) a project owned by the organization.
-2. Under APIs & Services → OAuth consent screen, choose Internal if available for the TAMU workspace, otherwise External, and enter the app name and support email.
-3. Under APIs & Services → Credentials, create an OAuth client ID of type Web application.
-4. Add the authorized redirect URI `https://WEBSITE_ADDRESS/auth/google_oauth2/callback`.
-5. Copy the client ID and secret into the Heroku Config Vars `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`.
-6. Open the website and select **Sign in with Google** with an account already added under People.
+2. Under Google Auth Platform → Branding, enter the app name and support email. Under Audience, choose Internal so only TAMU Google accounts can sign in.
+3. Under Google Auth Platform → Clients, create an OAuth client of type Web application.
+4. Add an authorized redirect URI for each website: `https://WEBSITE_ADDRESS/auth/google_oauth2/callback` for the live and practice websites, and `http://localhost:3000/auth/google_oauth2/callback` for developers. Changes can take a few minutes to apply.
+5. Copy the client ID and secret into the Heroku Config Vars `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` on each website. Google shows a new secret only once; if it is lost, open the client, select **Add secret**, and replace the Config Var.
+6. If nobody can sign in as Chief Engineer yet, add the first ones: `heroku run "bin/rails users:grant_chief_engineer EMAILS=first@tamu.edu,second@tamu.edu" -a APP_NAME`. It adds each email as a Chief Engineer (or promotes an existing person) and is safe to run again. Add everyone else under People.
+7. Open the website and select **Sign in with Google** with an account already added under People.
 
 ## People and access
 

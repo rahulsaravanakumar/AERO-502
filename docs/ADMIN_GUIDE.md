@@ -1,6 +1,6 @@
 # Administration, update, and recovery guide
 
-This guide covers the Sprint 2 release. Steps are numbered in the order they must be done. Use a practice copy of the website for training and recovery exercises. Never copy passwords, keys or secret values into this guide, chat, screenshots or recordings.
+This guide covers the existing release and the Sprint 3 KAN-25 sign-in and access changes. Steps are numbered in the order they must be done. Use a practice copy of the website for training and recovery exercises. Never copy passwords, keys or secret values into this guide, chat, screenshots or recordings.
 
 Keep a copy of this guide in an organization-owned location (for example the SAE AERO shared Google Drive) so leaders can open it after the student developers leave. The current version is also in the repository at `docs/ADMIN_GUIDE.md`.
 
@@ -41,17 +41,22 @@ Do this once, signed in to the organization's Google account. The current projec
 4. Add an authorized redirect URI for each website: `https://WEBSITE_ADDRESS/auth/google_oauth2/callback` for the live and practice websites, and `http://localhost:3000/auth/google_oauth2/callback` for developers. Changes can take a few minutes to apply.
 5. Copy the client ID and secret into the Heroku Config Vars `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` on each website. Google shows a new secret only once; if it is lost, open the client, select **Add secret**, and replace the Config Var.
 6. If nobody can sign in as Chief Engineer yet, add the first ones: `heroku run "bin/rails users:grant_chief_engineer EMAILS=first@tamu.edu,second@tamu.edu" -a APP_NAME`. It adds each email as a Chief Engineer (or promotes an existing person) and is safe to run again. Add everyone else under People.
-7. Open the website and select **Sign in with Google** with an account already added under People.
+7. Open the website and select **Sign in with Google** with an account already added under People. Choose the approved TAMU account in Google's account selector; no separate application password or password reset is needed.
+8. Before turning off practice passwords, check approved Google sign-in for a Chief Engineer, an officer and a member on the deployed website. Confirm their assigned role, class (team) and subteam are unchanged. Also check an unlisted account is denied without showing project information. Automated tests mock Google; they do not prove that the deployed OAuth credentials and audience are configured correctly.
 
 ## People and access
 
 Only people listed under **People** can sign in. Only the Chief Engineer can open this screen.
 
 1. Sign in as the Chief Engineer and select **People**.
-2. To approve a person, select **Add person**, enter their name and Google (TAMU) email, choose their role, team and subteam, and select **Add person**. They can sign in with Google immediately.
+2. To approve a person, select **Add person**, enter their name and Google (TAMU) email, choose their role, team and subteam, and select **Add person** to save. They can sign in with Google immediately, without a separate password or invitation. Email matching ignores capitalization; adding `JDoe@tamu.edu` also approves `jdoe@tamu.edu`. Class is labeled **Team** in the application. Select a subteam belonging to that team.
 3. To change a person's role, team or subteam, select **Change role** next to their name, make the change and select **Save role**. It takes effect the next time they load a page.
-4. To remove a person's access, select **Remove access** next to their name. They are signed out at their next page load and cannot sign in; their tasks and hours are kept.
-5. To let them back in, select **Restore access**.
+4. To remove a person's access, select **Remove access** next to their name. They are signed out at their next page load or submitted action, including a form they opened before removal, and cannot sign in. Their saved tasks, assignments and hours are kept; do not delete their records to remove access.
+5. To let them back in, select **Restore access**. They can use their approved Google account again.
+
+Officers and members have no People navigation or access-management controls. Direct requests to People or its add, edit, remove and restore actions are denied by the server. Google supplies proof of email ownership; the application's saved role, class and subteam determine access.
+
+If sign-in is denied, compare the selected Google email with the saved People entry and check whether it says **Access removed**. Choose the approved Google account or restore access as appropriate. A rejected or cancelled Google sign-in ends the previous application session; selecting an approved account starts a new one.
 
 The website blocks changing the last active Chief Engineer to another role or removing their access, including direct requests. A Chief Engineer whose access has already been removed does not count as an active administrator. Add another active Chief Engineer before removing the outgoing chief's role or access.
 

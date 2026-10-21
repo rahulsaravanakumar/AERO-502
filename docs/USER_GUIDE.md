@@ -1,6 +1,6 @@
 # AERO Task Hub user guide
 
-This guide covers the Sprint 2 release. Open it any time from **Help** in the page header or from the sign-in page. Every step is written out in words; nothing depends on a screenshot or on color. Every link, field and button can be reached with Tab and used with Enter or Space.
+This guide covers the existing release and the Sprint 3 KAN-25 sign-in and access changes. Open it any time from **Help** in the page header or from the sign-in page. Every step is written out in words; nothing depends on a screenshot or on color. Every link, field and button can be reached with Tab and used with Enter or Space.
 
 Never put real passwords or private member records in screenshots, notes or training material.
 
@@ -11,7 +11,11 @@ Never put real passwords or private member records in screenshots, notes or trai
 3. If your team is still using practice accounts, enter the practice email and password under **or use a practice account** and select **Sign in**.
 4. Select **Sign out** in the header when you finish.
 
-If you see "Access not authorized", see [Messages and what to do](#messages-and-what-to-do).
+Google sign-in does not require a separate website password. Your saved role, class (labeled **Team**) and subteam come from the Chief Engineer's People entry, not from your Google profile. Email matching ignores capitalization. The same approved account has the same access on a laptop or phone.
+
+Use Tab to reach **Sign in with Google** and Enter or Space to activate it. Complete Google's account selection with the keyboard. If you choose an unapproved account, select **Sign in with Google** again and choose the approved TAMU account; no developer setup is needed to switch accounts.
+
+If you see "Access not authorized", see [Messages and what to do](#messages-and-what-to-do). Rejected or cancelled Google sign-in signs you out of any previous website session. If your access is removed, your next page load or submitted action is denied, including an already-open form. Your saved tasks and hours remain.
 
 ## Find your work
 
@@ -93,9 +97,9 @@ The Chief Engineer manages every team. Officers manage subteams and projects in 
 ### People (Chief Engineer)
 
 1. Select **People**.
-2. Select **Add person**, enter the name and Google email, and choose the role, team and subteam. The person can sign in with Google straight away.
+2. Select **Add person**, enter the name and Google email, and choose the role, team and subteam. Select **Add person** to save. The person can sign in with Google straight away, with no separate password. Email capitalization does not matter. Class is labeled **Team**, and the subteam must belong to it.
 3. Select **Change role** to change someone's role, team or subteam. The change applies the next time they load a page.
-4. Select **Remove access** to stop someone signing in; their tasks and hours are kept. **Restore access** lets them sign in again.
+4. Select **Remove access** to stop someone signing in; their tasks and hours are kept. **Restore access** lets them sign in again. Removal also blocks actions submitted from already-open pages. Officers and members cannot open People or change the allowed-users list.
 
 ## Messages and what to do
 
@@ -121,4 +125,4 @@ The Chief Engineer manages every team. Officers manage subteams and projects in 
 | Project must belong to your team | An officer chose another team's project. | Choose one of your team's projects. |
 | The timeline is available to team officers and the Chief Engineer. | Members cannot open the timeline. | Use Tasks and My Tasks to see your dates. |
 | You can manage only your own team's subteams and projects. | An officer tried to change another team's group. | Ask the Chief Engineer. |
-| Only the Chief Engineer can manage people and roles. | Only the Chief Engineer can open People. | Ask the Chief Engineer to make the change. |
+| Access denied. Only the Chief Engineer can manage people and roles. | Only the Chief Engineer can open People. | Ask the Chief Engineer to make the change. |

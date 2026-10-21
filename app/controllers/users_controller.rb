@@ -51,7 +51,7 @@ class UsersController < ApplicationController
      private
 
      def ensure_chief_engineer
-          deny_access("Only the Chief Engineer can manage people and roles.") unless current_user.chief_engineer?
+          deny_access("Access denied. Only the Chief Engineer can manage people and roles.") unless current_user.chief_engineer?
      end
 
      def set_user

@@ -62,7 +62,7 @@
             <p><%= truncate(task.description, length: 110) %></p>
             <div class="task-foot">
               <span><%= task.assignees.map(&:name).to_sentence.presence || "Unassigned" %></span>
-              <strong><%= number_with_precision(task.total_actual_hours, precision: 1, strip_insignificant_zeros: true) %>/<%= number_with_precision(task.estimated_hours, precision: 1, strip_insignificant_zeros: true) %>h</strong>
+              <strong><%= number_with_precision(@hours ? @hours.actual_for_task(task) : task.total_actual_hours, precision: 1, strip_insignificant_zeros: true) %>/<%= number_with_precision(task.estimated_hours, precision: 1, strip_insignificant_zeros: true) %>h</strong>
             </div>
           </article>
         <% end %>
@@ -76,3 +76,5 @@
     <p><%= @view == "mine" ? "No tasks are assigned to you." : "There are no permitted tasks on this board." %></p>
   </div>
 <% end %>
+
+<%= render "tasks/hours", hours: @hours if @hours && @tasks.empty? %>

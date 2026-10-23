@@ -18,10 +18,13 @@ class TasksController < ApplicationController
                @tasks = @tasks.joins(:task_assignments)
                               .where(task_assignments: { user_id: current_user.id })
           end
+          if current_user.leader?
+               report = TaskReport.new(user: current_user, filter: task_filter, tasks: @tasks, from: params[:from], to: params[:to])
+          end
           # Leaders see member hours for the tasks on the board (scope S07, KAN-29).
           return unless @view == "board" && current_user.leader?
 
-          @hours = HourSummary.new(tasks: @tasks.to_a, from: params[:from], to: params[:to])
+          @hours = report.hours
      end
 
      def show

@@ -10,6 +10,9 @@ class TasksController < ApplicationController
      before_action :ensure_can_manage_task, only: %i[edit destroy]
 
      def index
+          if request.format.csv? && !current_user.leader?
+               return deny_access("Access denied. Reports are available to team officers and the Chief Engineer.")
+          end
           @tasks = task_filter.apply(Task.accessible_to(current_user))
                               .includes(:project, :team, :assignees, time_entries: :user)
                               .order(:status, :due_date, :title)
@@ -20,6 +23,7 @@ class TasksController < ApplicationController
           end
           if current_user.leader?
                report = TaskReport.new(user: current_user, filter: task_filter, tasks: @tasks, from: params[:from], to: params[:to])
+               return send_data(ReportCsv.tasks(report), filename: "tasks.csv", type: "text/csv; charset=utf-8") if request.format.csv?
           end
           # Leaders see member hours for the tasks on the board (scope S07, KAN-29).
           return unless @view == "board" && current_user.leader?

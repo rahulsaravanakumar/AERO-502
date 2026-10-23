@@ -30,6 +30,8 @@ Rails.application.routes.draw do
      end
      resources :teams, :subteams, :projects, only: %i[show new create edit update], concerns: :archivable
 
+     get "reports/member_hours", to: "reports#member_hours", as: :member_hours_report
+     get "reports/project_hours", to: "reports#project_hours", as: :project_hours_report
      resources :subteams, only: [] do
           resource :roster, only: %i[update destroy], controller: "rosters"
      end

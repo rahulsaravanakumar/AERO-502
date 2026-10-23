@@ -14,6 +14,6 @@ class TimelinesController < ApplicationController
      def ensure_leader
           return if current_user.leader?
 
-          redirect_to tasks_path, alert: "The timeline is available to team officers and the Chief Engineer."
+          redirect_to tasks_path, alert: "Access denied. The timeline is available to team officers and the Chief Engineer."
      end
 end

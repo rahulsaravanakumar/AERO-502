@@ -26,6 +26,14 @@
   </div>
 <% end %>
 
+<% if current_user.leader? %>
+  <div class="form-actions" aria-label="Download reports">
+    <%= link_to "Download CSV", tasks_path(format: :csv, view: @view, filter: task_filter.to_h, from: params[:from], to: params[:to]), class: "button button-secondary" %>
+    <%= link_to "Download member hours", member_hours_report_path(format: :csv, filter: task_filter.to_h, from: params[:from], to: params[:to]), class: "button button-secondary" %>
+    <%= link_to "Download project hours", project_hours_report_path(format: :csv, filter: task_filter.to_h, from: params[:from], to: params[:to]), class: "button button-secondary" %>
+  </div>
+<% end %>
+
 <% if @tasks.none? && task_filter.active? && Task.accessible_to(current_user).exists? %>
   <div class="panel empty-state">
     <h2>No tasks found</h2>

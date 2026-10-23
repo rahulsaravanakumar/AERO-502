@@ -132,8 +132,8 @@ RSpec.describe "Effort and dashboard delivery", type: :request do
           task = Task.create!(
                title: "Shared effort check", description: "Measure shared effort.",
                start_date: Date.new(2026, 10, 1),
-               estimated_hours: 8, due_date: Date.new(2026, 10, 20), status: :backlog, project: projects(:aero),
-               team: teams(:aerodynamics), creator: users(:officer)
+               estimated_hours: 8, due_date: Date.new(2026, 10, 20), status: :backlog, project_subteam: project_subteams(:aero_wing),
+               creator: users(:officer)
           )
           [ first_member, second_member ].each do |member|
                TaskAssignment.create!(task: task, user: member)

@@ -1,15 +1,14 @@
 class Project < ApplicationRecord
      include Archivable
 
-     belongs_to :subteam
-     has_many :tasks, dependent: :restrict_with_error
+     attr_readonly :team_id
+     belongs_to :team
+     has_many :project_subteams, dependent: :restrict_with_error
+     has_many :subteams, through: :project_subteams
+     has_many :tasks, through: :project_subteams
+     validates :name, presence: true, uniqueness: { scope: :team_id, case_sensitive: false }
 
-     delegate :team, to: :subteam
-
-     validates :name, presence: true, uniqueness: { scope: :subteam_id, case_sensitive: false }
-
-     # "Team · Subteam · Project", since names repeat across teams and subteams.
      def full_name
-          "#{team.name} · #{subteam.name} · #{name}"
+          "#{team.name} · #{name}"
      end
 end

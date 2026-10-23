@@ -108,7 +108,7 @@ RSpec.describe "Task card creation", type: :request do
 
           expect do
                post tasks_path, params: {
-                    task: valid_task(project_id: projects(:airframe_build).id)
+                    task: valid_task(project_id: projects(:airframe_build).id, subteam_id: subteams(:airframe).id)
                }
           end.to change(Task, :count).by(1)
           expect(Task.order(:id).last.team).to eq(teams(:structures))

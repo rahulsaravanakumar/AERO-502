@@ -39,7 +39,7 @@ RSpec.describe "Google sign-in", type: :request do
           %i[chief officer member].each do |role|
                person = users(role)
                person.update!(subteam: subteams(:wing)) unless person.chief_engineer?
-               assigned_attributes = person.attributes.slice("role", "team_id", "subteam_id", "name")
+               assigned_attributes = { "role" => person.role, "team_id" => person.team_id, "subteam_id" => person.subteam_id, "name" => person.name }
 
                2.times do
                     client = ActionDispatch::Integration::Session.new(Rails.application)
@@ -48,7 +48,8 @@ RSpec.describe "Google sign-in", type: :request do
                     expect(client.response.location).to eq("http://www.example.com#{root_path}")
                     client.follow_redirect!
                     expect(client.response.body).to include("#{person.name} · #{person.role_label}")
-                    expect(person.reload.attributes.slice(*assigned_attributes.keys)).to eq(assigned_attributes)
+                    person.reload
+                    expect(assigned_attributes.keys.to_h { |key| [ key, person.public_send(key) ] }).to eq(assigned_attributes)
                     client.get users_path
                     expect(client.response.status).to eq(person.chief_engineer? ? 200 : 302)
                     expect(client.response.body).to include("People") if person.chief_engineer?

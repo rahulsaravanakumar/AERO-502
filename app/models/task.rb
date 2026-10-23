@@ -1,10 +1,13 @@
 class Task < ApplicationRecord
      LINK_FORMAT_MESSAGE = "must each be a full web address starting with http:// or https://".freeze
 
-     # The project decides the task's subteam and team (scope S01/S03).
-     belongs_to :project
-     belongs_to :team
-     belongs_to :subteam
+     # One ownership key identifies both the shared project and responsible subteam.
+     belongs_to :project_subteam
+     has_one :project, through: :project_subteam
+     has_one :subteam, through: :project_subteam
+     has_one :team, through: :project
+     delegate :project_id, :subteam_id, to: :project_subteam, allow_nil: true
+     delegate :team_id, to: :project, allow_nil: true
      belongs_to :creator, class_name: "User", inverse_of: :created_tasks
 
      has_many :task_assignments, dependent: :destroy
@@ -30,7 +33,7 @@ class Task < ApplicationRecord
      validate :due_date_not_before_start_date
      validate :reference_links_are_web_addresses
 
-     before_validation :copy_groups_from_project
+     validates :project, presence: { message: "must exist" }
 
      after_save :replace_links, if: -> { @reference_urls }
      after_update :record_status_change, if: :saved_change_to_status?
@@ -39,7 +42,7 @@ class Task < ApplicationRecord
           if user.chief_engineer?
                all
           elsif user.officer?
-               where(team_id: user.team_id)
+               joins(:project_subteam).where(project_subteams: { project_id: Project.where(team_id: user.team_id).select(:id) })
           else
                joins(:task_assignments).where(task_assignments: { user_id: user.id })
           end
@@ -83,13 +86,6 @@ class Task < ApplicationRecord
      end
 
      private
-
-     def copy_groups_from_project
-          return if project.nil?
-
-          self.subteam = project.subteam
-          self.team = subteam.team
-     end
 
      def project_in_allowed_team
           return if allowed_team_id.nil? || team_id == allowed_team_id

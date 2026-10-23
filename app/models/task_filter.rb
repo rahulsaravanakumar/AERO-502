@@ -22,9 +22,10 @@ class TaskFilter
      end
 
      def apply(tasks)
-          tasks = tasks.where(project_id: project_id) if project_id
-          tasks = tasks.where(team_id: team_id) if team_id
-          tasks = tasks.where(subteam_id: subteam_id) if subteam_id
+          tasks = tasks.joins(:project_subteam)
+          tasks = tasks.where(project_subteams: { project_id: project_id }) if project_id
+          tasks = tasks.where(project_subteams: { project_id: Project.where(team_id: team_id).select(:id) }) if team_id
+          tasks = tasks.where(project_subteams: { subteam_id: subteam_id }) if subteam_id
           return tasks if query.blank?
 
           pattern = "%#{Task.sanitize_sql_like(query)}%"

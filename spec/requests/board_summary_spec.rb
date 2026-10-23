@@ -108,7 +108,7 @@ RSpec.describe "Board summary and hours", type: :request do
           expect(response.parsed_body.css(".task-card h3").map(&:text)).to eq([ "Wing load test" ])
           expect(hour_rows.keys).to eq([ "Morgan Member", "Project total" ])
           expect(response.parsed_body.at_css("#filter_project_id option[selected]").text)
-               .to eq("Aerodynamics · Wing Analysis · SAE AERO Design")
+               .to eq("Aerodynamics · SAE AERO Design")
      end
 
      it "keeps the hours date range when filters change, and the filters when dates change" do

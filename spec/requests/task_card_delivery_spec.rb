@@ -36,9 +36,7 @@ RSpec.describe "Delivered task card stories", type: :request do
                due_date: Date.new(2026, 10, 12),
                estimated_hours: 6.25,
                status: "backlog",
-               project_id: projects(:aero).id,
-               team_id: teams(:aerodynamics).id,
-               subteam_id: subteams(:wing).id,
+               project_subteam_id: project_subteams(:aero_wing).id,
                creator_id: users(:officer).id
           )
           expect(task.assignee_ids).to eq([ users(:member).id ])

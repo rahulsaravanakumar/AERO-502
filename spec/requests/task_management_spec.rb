@@ -84,7 +84,7 @@ RSpec.describe "Task management", type: :request do
           get edit_task_path(tasks(:spar_check))
           expect(response).to have_http_status(:ok)
           task = Task.create!(title: "Unused task", start_date: Date.current, due_date: Date.current,
-                              estimated_hours: 0, project: projects(:aero), creator: users(:chief))
+                              estimated_hours: 0, project_subteam: project_subteams(:aero_wing), creator: users(:chief))
           expect do
                delete task_path(task)
           end.to change(Task, :count).by(-1)

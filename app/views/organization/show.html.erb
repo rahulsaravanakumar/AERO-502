@@ -4,7 +4,7 @@
   <div>
     <p class="eyebrow">ADMINISTRATION</p>
     <h1>Teams, subteams and projects</h1>
-    <p class="lede">Each class (team) has subteams, and each subteam has projects. Tasks belong to a project. Select any name to see its tasks and hours.</p>
+    <p class="lede">Each class (team) owns projects shared by its participating subteams. Each task identifies its project and responsible subteam. Select any name to see its tasks and hours.</p>
   </div>
   <% if current_user.chief_engineer? %>
     <%= link_to "New team", new_team_path, class: "button" %>
@@ -15,7 +15,7 @@
   <div class="org-teams">
     <% @teams.each do |team| %>
       <% subteams = team.subteams.reject(&:archived?).sort_by(&:name) %>
-      <% project_count = subteams.sum { |subteam| subteam.projects.count { |project| !project.archived? } } %>
+      <% project_count = team.projects.count { |project| !project.archived? } %>
       <article class="panel org-team" data-team="<%= team.id %>">
         <header class="org-team-header">
           <div>
@@ -46,7 +46,7 @@
             <% else %>
               <p class="muted org-empty">No projects yet.</p>
             <% end %>
-            <%= link_to "+ Add project", new_project_path(subteam_id: subteam.id), class: "add-action add-project", aria: { label: "Add project to #{subteam.full_name}" } %>
+            <%= link_to "+ Add project", new_project_path(team_id: team.id), class: "add-action add-project", aria: { label: "Add project to #{subteam.full_name}" } %>
           </section>
         <% end %>
 

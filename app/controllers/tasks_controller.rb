@@ -34,7 +34,8 @@ class TasksController < ApplicationController
      end
 
      def create
-          @task = Task.new(task_params.except(:assignee_ids, :status))
+          @task = Task.new(task_params.except(:assignee_ids, :status, :project_id, :subteam_id))
+          assign_ownership
           @task.creator = current_user
           restrict_task_to_officer_team
 
@@ -53,7 +54,8 @@ class TasksController < ApplicationController
      def update
           return update_status_as_member unless current_user.can_manage?(@task)
 
-          @task.assign_attributes(task_params.except(:assignee_ids))
+          @task.assign_attributes(task_params.except(:assignee_ids, :project_id, :subteam_id))
+          assign_ownership
           @task.acting_user = current_user
           restrict_task_to_officer_team
 
@@ -111,9 +113,18 @@ class TasksController < ApplicationController
      def task_params
           params.require(:task).permit(
                :title, :description, :instructions, :reference_links_text, :start_date, :due_date,
-               :estimated_hours, :status, :project_id,
+               :estimated_hours, :status, :project_id, :subteam_id, :project_subteam_id,
                assignee_ids: []
           )
+     end
+
+     def assign_ownership
+          return unless task_params.key?(:project_id) || task_params.key?(:subteam_id)
+
+          project = Project.find_by(id: task_params.fetch(:project_id, @task.project_id))
+          subteam_id = task_params.fetch(:subteam_id, @task.subteam_id)
+          pairs = project ? project.project_subteams : ProjectSubteam.none
+          @task.project_subteam = subteam_id.present? ? pairs.find_by(subteam_id: subteam_id) : (pairs.first if pairs.one?)
      end
 
      def restrict_task_to_officer_team
@@ -138,10 +149,10 @@ class TasksController < ApplicationController
      # Everyday lists show active groups, plus the task's current ones when editing.
      def prepare_form
           team_ids = current_user.chief_engineer? ? Team.select(:id) : [ current_user.team_id ]
-          active = Project.active.joins(subteam: :team).merge(Subteam.active).merge(Team.active)
-                          .where(subteams: { team_id: team_ids })
-          current = Project.where(id: @task.project_id)
-          @projects = (active.includes(subteam: :team).to_a | current.includes(subteam: :team).to_a).sort_by(&:full_name)
-          @assignees = User.member.where(team_id: team_ids).order(:name)
+          active = Project.active.joins(:team).merge(Team.active).where(team_id: team_ids)
+          current = Project.where(id: @task.project_id, team_id: team_ids)
+          @projects = (active.includes(:team).to_a | current.includes(:team).to_a).sort_by(&:full_name)
+          @subteams = Subteam.active.where(team_id: team_ids).or(Subteam.where(id: @task.subteam_id, team_id: team_ids)).includes(:team).sort_by(&:full_name)
+          @assignees = User.member.in_teams(team_ids).order(:name)
      end
 end

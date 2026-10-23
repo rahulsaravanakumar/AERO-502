@@ -1,6 +1,17 @@
 require "rails_helper"
 
 RSpec.describe "Organization membership integrity" do
+     it "requires project and subteam parents to share a class and keeps ownership immutable" do
+          pair = ProjectSubteam.new(project: projects(:aero), subteam: subteams(:airframe))
+          expect(pair).not_to be_valid
+          expect(pair.errors[:subteam]).to include("must belong to the project's team")
+          expect(ProjectSubteam.new.valid?).to be_falsey
+          expect(ProjectSubteam.new(project: projects(:aero)).valid?).to be_falsey
+          expect(ProjectSubteam.new(subteam: subteams(:wing)).valid?).to be_falsey
+          pair = project_subteams(:aero_wing)
+          expect { pair.update!(subteam_id: subteams(:airframe).id) }.to raise_error(ActiveRecord::ReadonlyAttributeError)
+     end
+
      it "requires roster membership to belong to its class and validates missing parents" do
           membership = SubteamMembership.new(team_membership: team_memberships(:member), subteam: subteams(:airframe), joined_at: Time.current)
           expect(membership).not_to be_valid

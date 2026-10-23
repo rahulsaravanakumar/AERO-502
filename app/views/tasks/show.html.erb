@@ -15,6 +15,7 @@
   <section class="panel">
     <h2>Task details</h2>
     <dl class="detail-list">
+      <div><dt>Responsible subteam</dt><dd><%= @task.subteam.full_name %></dd></div>
       <div><dt>Expected deliverables</dt><dd><%= simple_format(@task.description) %></dd></div>
       <div><dt>Work instructions</dt><dd><%= simple_format(@task.instructions.presence || "No additional instructions.") %></dd></div>
       <div><dt>Assigned members</dt><dd><%= @task.assignees.map(&:name).to_sentence.presence || "Unassigned" %></dd></div>

@@ -1,12 +1,11 @@
 require "rails_helper"
 
 RSpec.describe Task, type: :model do
-     it "takes its subteam and team from its project, whatever else was set" do
+     it "derives its project, subteam and team from one ownership association" do
           task = tasks(:wing_test)
-          task.assign_attributes(subteam: subteams(:airframe), team: teams(:structures))
-
-          expect(task).to be_valid
+          expect(task.project).to eq(projects(:aero))
           expect([ task.subteam, task.team ]).to eq([ subteams(:wing), teams(:aerodynamics) ])
+          expect(Task.column_names).not_to include("project_id", "team_id", "subteam_id")
      end
 
      it "calculates member hours consistently with preloaded entries" do

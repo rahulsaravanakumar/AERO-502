@@ -4,7 +4,7 @@ class UsersController < ApplicationController
      before_action :set_user, only: %i[edit update revoke restore]
 
      def index
-          @users = User.includes(:team, :subteam).order(:name)
+          @users = User.includes(active_team_membership: [ :team, { subteam_memberships: :subteam } ]).order(:name)
      end
 
      # Adds a person to the allowed list; they sign in with Google using this email.

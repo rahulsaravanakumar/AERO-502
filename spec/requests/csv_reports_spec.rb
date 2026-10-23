@@ -56,6 +56,16 @@ RSpec.describe "Filtered CSV reports", type: :request do
           expect(csv_rows).to be_empty
      end
 
+     it "exports the timeline's task rows and refreshes changed dates" do
+          get timeline_path(filter: filter)
+          ids = response.parsed_body.css("[data-gantt-row]").map { |row| row["data-task-id"].to_i }
+          get timeline_path(format: :csv, filter: filter)
+          expect(csv_rows.map { |row| row["Task"].delete_prefix("'") }).to match_array(Task.where(id: ids).pluck(:title))
+          @shared.update!(due_date: day_two + 5)
+          get timeline_path(format: :csv, filter: filter)
+          expect(csv_rows.find { |row| row["Task"] == @shared.title }["Due date"]).to eq((day_two + 5).iso8601)
+     end
+
      it "includes zero-hour members without assignments and matches on-screen member totals" do
           get member_hours_report_path(format: :csv, filter: filter)
           expect(csv_rows.headers).to eq(ReportCsv::MEMBER_HEADERS)
@@ -105,7 +115,7 @@ RSpec.describe "Filtered CSV reports", type: :request do
           sign_in(users(:member))
           get tasks_path
           expect(response.body).not_to include("Download CSV", "Download member hours", "Download project hours")
-          [ tasks_path(format: :csv), member_hours_report_path(format: :csv), project_hours_report_path(format: :csv) ].each do |path|
+          [ tasks_path(format: :csv), timeline_path(format: :csv), member_hours_report_path(format: :csv), project_hours_report_path(format: :csv) ].each do |path|
                get path
                expect(response).to have_http_status(:found)
                expect(flash[:alert]).to include("Access denied")

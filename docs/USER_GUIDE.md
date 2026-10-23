@@ -1,6 +1,6 @@
 # AERO Task Hub user guide
 
-This guide covers the existing release and the Sprint 3 KAN-25 sign-in and access changes. Open it any time from **Help** in the page header or from the sign-in page. Every step is written out in words; nothing depends on a screenshot or on color. Every link, field and button can be reached with Tab and used with Enter or Space.
+This guide covers the existing release and the Sprint 3 sign-in, shared-project, roster, timeline and reporting changes. Open it any time from **Help** in the page header or from the sign-in page. Every step is written out in words; nothing depends on a screenshot or on color. Every link, field and button can be reached with Tab and used with Enter or Space.
 
 Never put real passwords or private member records in screenshots, notes or training material.
 
@@ -28,8 +28,8 @@ Members see the tasks assigned to them. Officers see their own team's tasks; the
 ## Search and filter tasks
 
 1. On the board, My Tasks or the Timeline, type a word in **Search tasks** to match task titles and descriptions.
-2. Choose a **Project**, a **Team** and, if needed, a **Subteam**. Projects are listed as "Team · Subteam · Project". Subteams are listed with their team, for example "Regular Class · Aerodynamics".
-3. Select **Apply**. Only tasks matching the search and both filters are shown.
+2. Choose a **Project**, a **Team** and, if needed, a **Subteam**. Projects are listed as "Team · Project" and can include several participating subteams. Subteams are listed with their team, for example "Regular Class · Aerodynamics".
+3. Select **Apply**. Only permitted tasks matching the search and selected filters are shown. Leaders can also choose a **Member** and **Task dates from/to**; the date filter includes tasks overlapping that period. Use **Additional teams** to include more classes (hold Ctrl on Windows to select several).
 4. Select **Clear** to show every task you are allowed to see again.
 
 Your filters stay applied when you move between the board, My Tasks and the Timeline. A member's board first opens on their own team and subteam.
@@ -62,7 +62,7 @@ You can change only entries you recorded yourself.
 ### Create or edit a task
 
 1. Select **New Task**.
-2. Enter a **Title**, then choose the **Project**. Projects are listed as "Team · Subteam · Project"; the task's team and subteam come from its project. Officers see only their own team's projects.
+2. Enter a **Title**, then choose the **Project**. Projects are listed as "Team · Project". Select a **Responsible subteam** that participates in that project; the parent team comes from the project. Officers see only their own team's projects.
 3. Enter the **Start date** (today by default), **Due date** and **Estimated hours** (0 or more). Deliverables, work instructions and reference links (one full web address per line) are optional.
 4. Tick the members to assign and select **Create Task**. New tasks start in Backlog.
 5. To change a task later, open it and select **Edit task**.
@@ -83,16 +83,38 @@ The task board doubles as the leader dashboard described in the acceptance tests
 
 1. Select **Timeline**. Each task is a bar from its start date to its due date, grouped by team and subteam. Gray is Backlog, blue is In progress, green is Completed, and red stripes mean overdue. The red vertical line is today.
 2. Choose how many weeks to **Show** and use the search, team and subteam filters, then select **Apply**.
-3. Use **‹ Previous**, **This week** and **Next ›** to move through time. A task outside the shown weeks says "Earlier" or "Later" on its row.
-4. **Dates as a list** below the chart gives the same start and due dates in text.
+3. Select **Download timeline CSV** to save the task rows represented by the filtered chart, including the start and due dates. Rows marked Earlier or Later are included, as they are in the readable date list.
+4. Use **‹ Previous**, **This week** and **Next ›** to move through time. A task outside the shown weeks says "Earlier" or "Later" on its row.
+5. **Dates as a list** below the chart gives the same start and due dates in text.
 
 ### Teams, subteams and projects
 
 1. Select **Teams**. Each class (team) lists its subteams, and each subteam lists its projects.
-2. Use **Add subteam** or **Add project** to create one, **Rename** to change a name, and **Archive** to remove it from everyday lists.
-3. Archived groups appear under **Archived**. Select one to see its tasks and hours, or select **Restore** to bring it back.
+2. Use **Add subteam** to create a subteam. To create a shared project, select **Add project**, choose its parent team, enter its name, tick the participating subteams and save. All participating subteams must belong to that parent team.
+3. Select a project's **Rename** action to change its name or participating subteams. Its parent team stays fixed. A subteam with recorded tasks cannot be removed from the project. Use **Archive** to remove a group from everyday lists.
+4. Archived groups appear under **Archived**. Select one to see its tasks and hours, or select **Restore** to bring it back.
 
 The Chief Engineer manages every team. Officers manage subteams and projects in their own team only.
+
+### Subteam rosters
+
+1. Select **Teams**, then a subteam's name, and find **Subteam roster**.
+2. Chief Engineers manage all rosters; officers manage rosters in their own class only. Members cannot open roster management or submit membership changes.
+3. Select an existing approved member under **Add approved member**, then **Add to roster**. Membership does not assign a task.
+4. Each row lists the member's permitted assigned work across their class, with its project, responsible subteam and status, or says **No assigned work**. Actual hours are 0 when none were recorded in the selected scope. Choose a project and **Hours from/to**, then **Apply roster scope**, to narrow work and dated hours.
+5. Select **Remove membership** to end the membership. Their account, task assignments and historical hours remain. Remove the current membership before adding the person to another subteam.
+
+The initial policy is one active class and one active subteam per person. Membership records preserve join/end dates so the policy can be revised following customer feedback. Projects identify the associated work; this release has no separate sprint entity. Zero recorded hours does not mean someone is available.
+
+### Download reports
+
+1. As a Chief Engineer or officer, apply the project, team(s), subteam, member, search and task-date filters on **Tasks**. A project filter combines work from its participating subteams; add a subteam filter to narrow it further.
+2. Select **Download CSV** for the task rows matching that view. The file includes task, project, team, subteam, assignees, status, start/due dates, estimated hours and actual hours.
+3. Select **Download member hours** for each relevant member's total, including members with no assignments or hours. **Download project hours** groups the same scoped hours by project. Class and Team columns both identify the parent class in this application.
+4. **Hours from/to** use the date the work was recorded for; both endpoint dates are included. Member/date filters apply equally to the displayed summary, task-card actual hours and downloaded totals. Shared task estimates are counted once in the project total.
+5. Open the CSV in Excel or Google Sheets. Empty task results produce column headings; member reports still show relevant zero-hour members. Formula-looking names or task titles are exported as literal text for spreadsheet safety.
+
+Members have no export controls. Direct requests are denied. Officers' downloads contain only their own class's permitted work, even if a request supplies another class's filters.
 
 ### People (Chief Engineer)
 
@@ -126,3 +148,11 @@ The Chief Engineer manages every team. Officers manage subteams and projects in 
 | The timeline is available to team officers and the Chief Engineer. | Members cannot open the timeline. | Use Tasks and My Tasks to see your dates. |
 | You can manage only your own team's subteams and projects. | An officer tried to change another team's group. | Ask the Chief Engineer. |
 | Access denied. Only the Chief Engineer can manage people and roles. | Only the Chief Engineer can open People. | Ask the Chief Engineer to make the change. |
+| Access denied. Reports are available to team officers and the Chief Engineer. | Your role cannot download leader reports. | Use your assigned task view or ask an officer for an authorized report. |
+| Access denied. Only authorized leaders can manage this roster. | You do not manage this class's roster. | Ask its officer or the Chief Engineer. |
+| Choose an approved member from this class. | The selected account is unavailable, unapproved or in another class. | Select an approved member from this class; ask the Chief Engineer to correct access if needed. |
+| Remove the member's current subteam membership before adding another. | The person already belongs to a subteam. | Remove that membership first, then add the new one. |
+| This member does not belong to this roster. | The membership has already changed or the wrong member was selected. | Refresh the roster before trying again. |
+| Subteams cannot remove a subteam with recorded tasks | Existing tasks reference that project/subteam combination. | Keep the subteam in the project or archive the project; its records are preserved. |
+| Subteams must include at least one subteam from the project's team | A project needs participating subteams from its parent class. | Select one or more of that class's subteams and save. |
+| Project subteam must exist / Project must exist | The task's project and responsible subteam are missing or not a valid participating pair. | Choose the project and one of its participating subteams. |

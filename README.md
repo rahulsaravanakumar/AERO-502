@@ -1,14 +1,17 @@
 # AERO Task Hub
 
-A Vivify Scrum-style, role-aware task and effort tracker for the SAE AERO Design team. Sprint 1 provides authentication, task cards and assignments, member status updates, actual-hour logging, and a meeting-ready planned-versus-actual dashboard.
+A Vivify Scrum-style, role-aware task and effort tracker for the SAE AERO Design team. The application provides approved Google access, shared team-level projects, subteam rosters, task assignments and status updates, dated hour logging, a schedule timeline, and filtered CSV reports.
 
-## Sprint 1 capabilities
+## Capabilities
 
 - Chief Engineers can view and manage every team's work.
 - Officers can create, assign, and edit tasks only for their own team.
 - Members can see only assigned work, update its status, and log their own hours.
 - Task cards capture deliverables, work instructions, links, due dates, estimates, status, and multiple assignees.
 - Dashboards show assignments, statuses, estimated hours, actual hours, variance, and member totals.
+- Projects can involve several subteams of their parent team; every task identifies its responsible subteam.
+- Leaders maintain rosters independently of assignments, including members with no work or recorded hours.
+- Task, timeline, member-hour and project-hour CSV downloads follow the same access rules and filters as the website.
 - Server-side authorization protects direct URLs as well as navigation.
 
 ## Local setup
@@ -43,4 +46,5 @@ SimpleCov enforces 100% line coverage. GitHub Actions runs RSpec with PostgreSQL
 - [Sprint 1 traceability and evidence](docs/SPRINT1_EVIDENCE.md)
 - [Five-aspect quality strategy](docs/QUALITY_STRATEGY.md)
 - [Verification results](docs/VERIFICATION.md)
+- [Sprint 3 stories and migration verification](docs/SPRINT3_STORIES_VERIFICATION.md)
 - [Canvas submission checklist](docs/SUBMISSION_CHECKLIST.md)

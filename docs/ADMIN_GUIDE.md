@@ -1,6 +1,6 @@
 # Administration, update, and recovery guide
 
-This guide covers the existing release and the Sprint 3 KAN-25 sign-in and access changes. Steps are numbered in the order they must be done. Use a practice copy of the website for training and recovery exercises. Never copy passwords, keys or secret values into this guide, chat, screenshots or recordings.
+This guide covers the existing release and the Sprint 3 sign-in, shared-project, roster, timeline and reporting changes. Steps are numbered in the order they must be done. Use a practice copy of the website for training and recovery exercises. Never copy passwords, keys or secret values into this guide, chat, screenshots or recordings.
 
 Keep a copy of this guide in an organization-owned location (for example the SAE AERO shared Google Drive) so leaders can open it after the student developers leave. The current version is also in the repository at `docs/ADMIN_GUIDE.md`.
 
@@ -78,16 +78,35 @@ For the live website, enter the agreed real structure through the Teams screen i
 
 ## Managing teams, subteams and projects
 
-Each class (team) has subteams, and each subteam has projects. Every task belongs to a project.
+Each class (team) owns projects. A project can involve several of that class's subteams; each task identifies one project and its responsible participating subteam.
 
 1. Select **Teams**.
 2. The Chief Engineer selects **New team** to add a class.
 3. Select **Add subteam** under a team, enter the name and select **Save subteam**.
-4. Select **Add project** under a subteam, enter the name and select **Save project**.
-5. Select **Rename** to change a name. A subteam stays in its team and a project stays in its subteam.
+4. Select **Add project**, choose its parent team, enter the name, tick one or more participating subteams from that team, and select **Save project**.
+5. Select **Rename** to change a name. A subteam and a project stay in their parent team. A project's Rename form also maintains its participating subteams; a subteam with recorded tasks cannot be removed.
 6. Select **Archive** to remove a group from everyday lists. Its tasks and hours are kept: select it under **Archived** to see them, or select **Restore** to bring it back.
 
 The Chief Engineer manages every team. Officers add, rename and archive subteams and projects in their own team only.
+
+## Subteam membership and reports
+
+1. Open **Teams**, select a subteam and read **Subteam roster**. The Chief Engineer manages all rosters; officers manage only their own class. Members have no roster-management access.
+2. Select an approved member of that class and **Add to roster**. The initial policy permits one active subteam per person. Remove an existing subteam membership before adding another. Membership and task assignment are separate records.
+3. Roster rows include assigned work across the member's class, even when another subteam is responsible for the task. Use the roster's project and worked-date controls to inspect assignments and hours. Members with no work remain visible, with 0 actual hours. No separate sprint entity exists in this release.
+4. Select **Remove membership** to end only that relationship; the user, assignments, hours and task history are retained. Removing account access remains a Chief Engineer action under **People**.
+5. Use **Download CSV**, **Download member hours**, **Download project hours** on Tasks or **Download timeline CSV** on Timeline. Selected filters apply, with officers limited to their own class. Zero-hour members remain in member reports. Compare like-for-like project/member/date scopes when checking totals.
+
+The normalized membership tables can support additional membership policies later. The current forms and primary-role interface deliberately enforce one active class/subteam. Changing that policy requires updating those controls and authorization tests, rather than reconstructing historical assignments or hours.
+
+## Sprint 3 database update
+
+1. Capture and retain a database backup before deployment. Record task, user, project, assignment, link and history counts and total hours by member/task.
+2. Run the two October 23 migrations on a restored staging copy first. They preserve record IDs and timestamps, backfill project/subteam associations and membership records, then remove duplicated ownership and membership columns. Officer/member roles move to class membership; the Chief Engineer role remains global.
+3. If migration reports inconsistent task ownership, confirm the intended project, class and subteam for each affected task before retrying. If it reports duplicate project names within a class, obtain an explicit rename decision. Do not merge projects merely because their names match.
+4. Compare the saved counts, ownership, role outcomes and hour totals. Check shared-project filters, roster changes, all report types, Google sign-in and the last-Chief-Engineer guard on staging.
+5. Deploy the reviewed commit and run the same migrations on the live database through the release process. Do not run `db:seed` on a live organization database.
+6. If rollback is needed, restore the pre-update backup and the matching previous application release. These migrations cannot safely convert shared projects or normalized memberships back to the old schema automatically.
 
 ## Routine administration
 

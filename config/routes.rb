@@ -30,6 +30,10 @@ Rails.application.routes.draw do
      end
      resources :teams, :subteams, :projects, only: %i[show new create edit update], concerns: :archivable
 
+     resources :subteams, only: [] do
+          resource :roster, only: %i[update destroy], controller: "rosters"
+     end
+
      resources :tasks do
           resources :time_entries, only: %i[create edit update destroy], shallow: true
      end

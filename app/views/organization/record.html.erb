@@ -53,3 +53,5 @@
     <p class="muted">No tasks are recorded here.</p>
   <% end %>
 </section>
+
+<%= render "subteams/roster" if @record.is_a?(Subteam) %>
